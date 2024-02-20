@@ -1,4 +1,5 @@
 # L3SINF Projet IHM
+CALC
 
 ## Contexte
 Dans ce projet, nous devons programmer une application avec une IHM.

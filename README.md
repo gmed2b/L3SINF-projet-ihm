@@ -8,5 +8,5 @@ Notre inspiration se fonde sur l'application Anki, cependant elle est très peu 
 ## Présentations
 
 Voici les liens vers les différentes présentation montrés en classe :
-- [Présentation calculatrice](https://www.canva.com/design/DAF9VJuEL5o/JPFZOHsX63Q3BFm5MUjrTQ/edit?utm_content=DAF9VJuEL5o&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
-- [Présentation du projet - PrestuThink](https://www.canva.com/design/DAF82SGmcXM/65wGmZXOP2SxXBZMBkTQQw/edit?utm_content=DAF82SGmcXM&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+- [Présentation calculatrice](https://www.canva.com/design/DAF9VJuEL5o/R7Plr9m7-TJSe962BasVXQ/view?utm_content=DAF9VJuEL5o&utm_campaign=designshare&utm_medium=link&utm_source=editor)
+- [Présentation du projet - PrestuThink](https://www.canva.com/design/DAF82SGmcXM/_xUJKaav0MRmMIPLK7CH1w/view?utm_content=DAF82SGmcXM&utm_campaign=designshare&utm_medium=link&utm_source=editor)

@@ -11,7 +11,7 @@ def main(page: ft.Page):
     page.window_max_width = 300
     page.window_max_height = 420
     page.padding = ft.Padding(15, 15, 15, 15)
-    page.theme_mode = ft.ThemeMode.LIGHT
+    page.theme_mode = ft.ThemeMode.DARK
     page.theme = ft.Theme(color_scheme_seed="orange")
 
     def handle_clear(e: ControlEvent):

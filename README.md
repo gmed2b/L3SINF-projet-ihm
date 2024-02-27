@@ -1,12 +1,9 @@
-# L3SINF Projet IHM
+# L3SINF Projet IHM - Calculatrices
 
-## Contexte
-Dans ce projet, nous devons programmer une application avec une IHM.
-Nous avons fait le choix de créer une application de révision basé sur l'auto-évolution tout en suivant la courbe d'Ebbinghaus.
-Notre inspiration se fonde sur l'application Anki, cependant elle est très peu intuitive et la mise en place est conséquente.
+Vous retrouverez dans cette branche, les demos de calculatrices faites avec la librairie Flet.
 
-## Présentations
+Le dossier `antocreadev-calculator` est un submodule git vers le `repository` d'Anthony.
+Le dossier `mehdi-calculator` est un dossier vers l'exemple de calculatrice d'Anthony.
 
-Voici les liens vers les différentes présentation montrés en classe :
 - [Présentation calculatrice](https://www.canva.com/design/DAF9VJuEL5o/R7Plr9m7-TJSe962BasVXQ/view?utm_content=DAF9VJuEL5o&utm_campaign=designshare&utm_medium=link&utm_source=editor)
-- [Présentation du projet - PrestuThink](https://www.canva.com/design/DAF82SGmcXM/_xUJKaav0MRmMIPLK7CH1w/view?utm_content=DAF82SGmcXM&utm_campaign=designshare&utm_medium=link&utm_source=editor)
+

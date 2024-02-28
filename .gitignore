@@ -1,2 +1,5 @@
 .DS_Store
-
+# API
+api/venv
+api/.DS_Store
+api/venv/*

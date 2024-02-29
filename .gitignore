@@ -3,3 +3,5 @@
 api/venv
 api/.DS_Store
 api/venv/*
+
+.env

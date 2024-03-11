@@ -2,8 +2,17 @@
 # sqlalchemy.orm est utilisé pour la session de la base de données, cela permet d'accéder à la base de données, de la lire et de l'écrire, etc.
 from sqlalchemy.orm import Session
 # fastapi.HTTPException est utilisé pour lever des exceptions HTTP
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Depends
+# OAuth2PasswordBearer est utilisé pour la gestion de l'authentification
+from fastapi.security import OAuth2PasswordBearer
+# typing.Annotated est utilisé pour les annotations
+from typing import Annotated
+# jose.JWTError est utilisé pour gérer les erreurs liées au JWT, jose.jwt est utilisé pour la gestion des JWT
+from jose import JWTError
 import models, schemas, tasks, database
+
+# --- Configuration de l'authentification
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # --- Fonctions de services
 def create_database():
@@ -70,3 +79,25 @@ async def authenticate_user(db: Session, email: str, password: str):
         )
     access_token = tasks.create_access_token(data={"sub": user.email})
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+async def get_current_user(
+    db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
+):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = tasks.jwt.decode(token, tasks.SECRET_KEY, algorithms=[tasks.ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise credentials_exception
+        token_data = schemas.TokenData(email=email)
+    except JWTError:
+        raise credentials_exception
+    user = db.query(models.User).filter(models.User.email == token_data.email).first()
+    if user is None:
+        raise credentials_exception
+    return user

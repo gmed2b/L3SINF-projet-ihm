@@ -9,10 +9,27 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 # datetime est utilisé pour la gestion des dates
 from datetime import datetime, timedelta
+# typing.Annotated est utilisé pour la gestion des annotations
+from typing import Annotated
 import schemas, services
 
+# --- Catégories des endpoints (voir documentations Swagger/redocs)
+tags_metadata = [
+     {
+        "name": "Server",
+        "description": "Monitor the server state",
+    },
+    {
+        "name": "Users",
+        "description": "Operations with users. The **login** logic is also here.",
+    },
+]
+
 # --- FastAPI app
-app = FastAPI()
+app = FastAPI(
+    title="NotaBene API",
+    description="This is the API documentation for the NotaBene project ✨📚",
+)
 
 # Migration de la base de données
 services.create_database()
@@ -35,8 +52,24 @@ app.add_middleware(
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # --- Routes
+# --- Server 
+@app.get("/", tags=["Server"])
+async def root():
+    """
+    Cette route permet de vérifier si le serveur est en ligne
+    """
+    return {"message": "NotaBene API is online, welcome to the API documentation at /docs or /redocs"}
+
+@app.get("/unixTimes", tags=["Server"])
+async def read_item():
+    """
+    Cette route permet de récupérer le temps UNIX
+    """
+    unix_timestamp = datetime.now().timestamp()
+    return {"unixTime": unix_timestamp} 
+
 # --- Users 
-@app.post("/token", response_model=schemas.Token)
+@app.post("/token", response_model=schemas.Token, tags=["Users"])
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(services.get_db)
@@ -49,7 +82,7 @@ async def login_for_access_token(
     """
     return await services.authenticate_user(db, form_data.username, form_data.password)
 
-@app.post("/addUser/", response_model=schemas.User)
+@app.post("/addUser/", response_model=schemas.User, tags=["Users"])
 async def add_user(
     user: schemas.UserCreate,
     db: Session = Depends(services.get_db)
@@ -62,7 +95,7 @@ async def add_user(
     """
     return await services.add_user(db, user)
 
-@app.get("/getAllUsers/", response_model=list[schemas.User])
+@app.get("/getAllUsers/", response_model=list[schemas.User], tags=["Users"])
 async def read_users(
     db: Session = Depends(services.get_db)
 )-> list[schemas.User]:
@@ -72,3 +105,9 @@ async def read_users(
     @return list[schemas.User]
     """
     return await services.get_all_users(db)
+
+@app.get("/users/me/", response_model=schemas.User, tags=["Users"])
+async def read_users_me(
+    current_user: Annotated[schemas.User, Depends(services.get_current_user)]
+):
+    return current_user

@@ -1,24 +1,45 @@
+# --- Importation des modules
+# sqlalchemy.orm est utilisé pour la session de la base de données, cela permet d'accéder à la base de données, de la lire et de l'écrire, etc.
 from sqlalchemy.orm import Session
+# fastapi.HTTPException est utilisé pour lever des exceptions HTTP
 from fastapi import HTTPException, status
-import models
-import schemas
-import tasks
-import database
+import models, schemas, tasks, database
 
+# --- Fonctions de services
 def create_database():
+    """
+    Cette fonction permet de créer la base de données
+    @return None
+    """
     return database.Base.metadata.create_all(bind=database.engine)
 
 def get_db() -> Session:
+    """
+    Cette fonction permet de récupérer la session de la base de données
+    @return Session
+    """
     db = database.SessionLocal()
     try:
         yield db
     finally:
         db.close()
 
-async def get_all_users(db: Session):
+# --- Users
+async def get_all_users(db: Session) -> list:
+    """
+    Cette fonction permet de récupérer tous les utilisateurs
+    @param db: Session
+    @return list
+    """
     return db.query(models.User).all()
 
-async def add_user(db: Session, user: schemas.UserCreate):
+async def add_user(db: Session, user: schemas.UserCreate) -> models.User:
+    """
+    Cette fonction permet d'ajouter un utilisateur
+    @param db: Session
+    @param user: schemas.UserCreate
+    @return models.User
+    """
     hashed_password = tasks.get_password_hash(user.password)
     db_user = models.User(
         firstname=user.firstname,
@@ -33,6 +54,13 @@ async def add_user(db: Session, user: schemas.UserCreate):
     return db_user
 
 async def authenticate_user(db: Session, email: str, password: str):
+    """
+    Cette fonction permet d'authentifier un utilisateur
+    @param db: Session
+    @param email: str
+    @param password: str
+    @return dict
+    """
     user = db.query(models.User).filter(models.User.email == email).first()
     if not user or not tasks.verify_password(password, user.password):
         raise HTTPException(

@@ -1,15 +1,22 @@
+# --- Importation des modules
+# -- Fast API 
 from fastapi import FastAPI, HTTPException, status, Depends
+# OAuth2PasswordBearer est utilisé pour la gestion de l'authentification, OAuth2PasswordRequestForm est utilisé pour la gestion de la requête d'authentification
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+# CORS est utilisé pour la gestion des requêtes CORS 
 from fastapi.middleware.cors import CORSMiddleware
+# --- SQLAlchemy
 from sqlalchemy.orm import Session
+# datetime est utilisé pour la gestion des dates
 from datetime import datetime, timedelta
-import schemas
-import tasks
-import services
+import schemas, services
 
+# --- FastAPI app
 app = FastAPI()
 
-# Configuration CORS
+# --- Configuration CORS
+# il est possible de passer un tableau avec les origines autorisées, les méthodes autorisées, les en-têtes autorisés, etc.
+# ici, on autorise toutes les origines, les méthodes, les en-têtes, etc car on est en développement, en production, il faudra restreindre ces valeurs
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -18,28 +25,44 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# --- Configuration de l'authentification
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-# Route pour l'obtention d'un token d'accès
+# --- Routes
+# --- Users 
 @app.post("/token", response_model=schemas.Token)
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(services.get_db)
-):
-    # À noter que : username = email
+)-> schemas.Token:
+    """
+    Cette route permet de se connecter et de récupérer un token d'accès, à noter qu'ici : username = email
+    @param form_data: OAuth2PasswordRequestForm
+    @param db: Session
+    @return schemas.Token
+    """
     return await services.authenticate_user(db, form_data.username, form_data.password)
 
-# Route pour ajouter un utilisateur
-@app.post("/add/", response_model=schemas.User)
+@app.post("/addUser/", response_model=schemas.User)
 async def add_user(
     user: schemas.UserCreate,
     db: Session = Depends(services.get_db)
-):
+)-> schemas.User:
+    """
+    Cette route permet d'ajouter un utilisateur
+    @param user: schemas.UserCreate
+    @param db: Session
+    @return schemas.User
+    """
     return await services.add_user(db, user)
 
-# Route pour récupérer tous les utilisateurs
-@app.get("/users/", response_model=list[schemas.User])
+@app.get("/getAllUsers/", response_model=list[schemas.User])
 async def read_users(
     db: Session = Depends(services.get_db)
-):
+)-> list[schemas.User]:
+    """
+    Cette route permet de récupérer tous les utilisateurs
+    @param db: Session
+    @return list[schemas.User]
+    """
     return await services.get_all_users(db)

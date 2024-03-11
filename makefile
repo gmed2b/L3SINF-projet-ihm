@@ -7,6 +7,4 @@ clean-api:
 run-ihm: 
 	python3 ihm/main.py
 
-
-
 .PHONY: run-api clean-api run-ihm

@@ -14,6 +14,12 @@ import schemas, services
 # --- FastAPI app
 app = FastAPI()
 
+# Migration de la base de données
+services.create_database()
+
+# Instance de la base de données
+services.get_db()
+
 # --- Configuration CORS
 # il est possible de passer un tableau avec les origines autorisées, les méthodes autorisées, les en-têtes autorisés, etc.
 # ici, on autorise toutes les origines, les méthodes, les en-têtes, etc car on est en développement, en production, il faudra restreindre ces valeurs

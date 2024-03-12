@@ -19,7 +19,6 @@ def get_unix_times():
     else:
         print("Impossible de récupérer le temps UNIX.")
 
-
 def main():
     print("Bienvenue dans le CLI de l'API NotaBene.")
     while True:

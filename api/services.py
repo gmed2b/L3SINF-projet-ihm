@@ -109,7 +109,6 @@ async def get_current_user(
     return user
 
 # --- Decks
-# fonction pour ajouter un deck à la base de données
 async def add_deck(db: Session, deck: schemas.DeckCreate, user: models.User) -> models.Deck:
     """
     Cette fonction permet d'ajouter un deck
@@ -146,7 +145,6 @@ async def add_deck(db: Session, deck: schemas.DeckCreate, user: models.User) -> 
     user.deck_progress.append(db_progress)
     return db_deck
 
-# fonction pour récupérer tous les decks d'un utilisateur
 async def get_decks(db: Session, user: models.User) -> list:
     """
     Cette fonction permet de récupérer tous les decks d'un utilisateur
@@ -156,7 +154,6 @@ async def get_decks(db: Session, user: models.User) -> list:
     """
     return user.decks
 
-# fonction pour récupérer un deck spécifique lié à l'utilisateur connecté
 async def get_deck(db: Session, deck_id: int, user: models.User) -> models.Deck:
     """
     Cette fonction permet de récupérer un deck spécifique
@@ -171,7 +168,6 @@ async def get_deck(db: Session, deck_id: int, user: models.User) -> models.Deck:
 
 
 # --- Cards
-# Création d'une carte dans un deck
 async def add_card(db: Session, card: schemas.CardCreate, deck_id : models.Deck) -> models.Card:
     """
     Cette fonction permet d'ajouter une carte à un deck
@@ -198,8 +194,26 @@ async def add_card(db: Session, card: schemas.CardCreate, deck_id : models.Deck)
 
     return db_card
 
+async def update_card(db: Session, card_id: int, state: str, user_id: str) -> models.Card:
+    """
+    Cette fonction permet de mettre à jour l'état d'une carte
+    @param db: Session
+    @param card_id: int
+    @param state: str
+    @param user_id: str
+    @return models.Card
+    """
+    card = db.query(models.Card).filter(models.Card.id == card_id).first()
+    if card is None:
+        raise HTTPException(status_code=404, detail="Card not found")
+    # if card.deck.owner_id != user_id:
+    #     raise HTTPException(status_code=403, detail="You are not the owner of the deck")
+    card.state = state
+    db.commit()
+    db.refresh(card)
+    return card
+
 # --- Train
-# fonction pour récupérer une carte aléatoire d'un deck 
 async def get_random_card(db: Session, deck_id: int, user: models.User) -> models.Card:
     """
     Cette fonction permet de récupérer une carte aléatoire d'un deck

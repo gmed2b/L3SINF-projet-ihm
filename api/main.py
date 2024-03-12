@@ -153,7 +153,6 @@ async def read_decks(
     """
     return await services.get_decks(db, current_user)
 
-# fonction pour récupérer un deck spécifique lié à l'utilisateur connecté
 @app.get("/getDeck/{deck_id}", response_model=schemas.Deck, tags=["Deck"])
 async def read_deck(
     deck_id: int,
@@ -187,8 +186,24 @@ async def add_card(
     """
     return await services.add_card(db, card, deck_id)
 
+@app.put("/updateCard/{card_id}", response_model=schemas.Card, tags=["Card"])
+async def update_card(
+    card_id: int,
+    current_user: Annotated[schemas.User, Depends(services.get_current_user)],
+    state: str = "not memorized" or "memorized" or "in progress", # créer un enum pour les états + faire un schema + gérer les erreurs 
+    db: Session = Depends(services.get_db),
+)-> schemas.Card:
+    """
+    Cette route permet de modifier le statut d'une carte
+    @param card_id: int
+    @param card: schemas.CardBase
+    @param current_user: schemas.User
+    @param db: Session
+    @return schemas.Card
+    """
+    return await services.update_card(db, card_id, state, current_user)
+
 # --- Train
-# fonction pour récupérer les cartes d'un deck spécifique aléatoirement
 @app.get("/getRandomCard/{deck_id}", response_model=schemas.Card, tags=["Train"])
 async def read_random_card(
     deck_id: int,

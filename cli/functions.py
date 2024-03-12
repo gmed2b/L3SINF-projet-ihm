@@ -1,8 +1,6 @@
 import requests
 
 API_BASE_URL = "http://127.0.0.1:8000" 
-TOKEN = ""
-HEADER =  {"Authorization ": f"Bearer {TOKEN}"}
 
 def check_server_status():
     """
@@ -30,13 +28,15 @@ def login(username, password):
     """
     Authentifie l'utilisateur et récupère le token, modifie la variable globale TOKEN avec un effet de bord.
     """
-    global TOKEN
-    response = requests.post(f"{API_BASE_URL}/token", json={"username": username, "password": password})
+    response = requests.post(f"{API_BASE_URL}/token", data={"username": username, "password": password})
+    access_token = response.json()["access_token"]
     if response.status_code == 200:
-        TOKEN = response.json()["token"]
-        print("Authentification réussie. \nVotre token est:", TOKEN)
+        with open("db.txt", "w") as file:
+            file.write(access_token)
+  
+        print("Authentification réussie. \nVotre token est:", access_token)
     else:
-        print("Authentification échouée.")
+        print("Authentification échouée. ", response.json()["detail"])
 
 def get_user_info():
     """
@@ -61,7 +61,7 @@ def add_deck(deck_name):
 
 def get_all_decks():
     """
-    Récupère tous les decks.
+    Récupère tous les decks de l'utilisateur.
     """
     response = requests.get(f"{API_BASE_URL}/getAllDecks", headers = HEADER)
     if response.status_code == 200:
@@ -108,6 +108,7 @@ def get_random_card(deck_id):
     response = requests.get(f"{API_BASE_URL}/getRandomCard/{deck_id}", headers = HEADER)
     if response.status_code == 200:
         card = response.json()
-        print("Carte aléatoire:", card)
+        print("Carte aléatoire:")
+        return card
     else:
         print("Impossible de récupérer la carte aléatoire.")

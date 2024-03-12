@@ -18,8 +18,8 @@ class User(Base):
 
     # Relation: Un utilisateur peut suivre plusieurs autres utilisateurs
     following = relationship("User", secondary="user_followers", 
-                             primaryjoin="User.id==UserFollowers.c.user_id",
-                             secondaryjoin="User.id==UserFollowers.c.following_id",
+                             primaryjoin="User.id==UserFollowers.user_id",
+                             secondaryjoin="User.id==UserFollowers.following_id",
                              backref="followers")
     
     # Relation: Un utilisateur peut posséder plusieurs decks)

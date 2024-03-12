@@ -23,6 +23,18 @@ tags_metadata = [
         "name": "Users",
         "description": "Operations with users. The **login** logic is also here.",
     },
+    {
+        "name": "Deck",
+        "description": "Operations with decks.",
+    },
+    {
+        "name": "Card",
+        "description": "Operations with cards.",
+    }, 
+    {
+        "name": "Train",
+        "description": "Operations with training.",
+    },
 ]
 
 # --- FastAPI app
@@ -111,3 +123,83 @@ async def read_users_me(
     current_user: Annotated[schemas.User, Depends(services.get_current_user)]
 ):
     return current_user
+
+# --- Deck
+@app.post("/addDeck/", response_model=schemas.Deck, tags=["Deck"])
+async def add_deck(
+    deck: schemas.DeckBase,
+    current_user: Annotated[schemas.User, Depends(services.get_current_user)],
+    db: Session = Depends(services.get_db)
+)-> schemas.Deck:
+    """
+    Cette route permet d'ajouter un deck
+    @param deck: schemas.DeckBase
+    @param current_user: schemas.User
+    @param db: Session
+    @return schemas.Deck
+    """
+    return await services.add_deck(db, deck, current_user)
+
+@app.get("/getAllDecks/", response_model=list[schemas.Deck], tags=["Deck"])
+async def read_decks(
+    current_user: Annotated[schemas.User, Depends(services.get_current_user)],
+    db: Session = Depends(services.get_db)
+)-> list[schemas.Deck]:
+    """
+    Cette route permet de récupérer tous les decks de l'utilisateur connecté
+    @param current_user: schemas.User
+    @param db: Session
+    @return list[schemas.Deck]
+    """
+    return await services.get_decks(db, current_user)
+
+# fonction pour récupérer un deck spécifique lié à l'utilisateur connecté
+@app.get("/getDeck/{deck_id}", response_model=schemas.Deck, tags=["Deck"])
+async def read_deck(
+    deck_id: int,
+    current_user: Annotated[schemas.User, Depends(services.get_current_user)],
+    db: Session = Depends(services.get_db),
+)-> schemas.Deck:
+    """
+    Cette route permet de récupérer un deck spécifique
+    @param deck_id: int
+    @param current_user: schemas.User
+    @param db: Session
+    @return schemas.Deck
+    """
+    return await services.get_deck(db, deck_id, current_user)
+
+# --- Card
+@app.post("/addCard/", response_model=schemas.Card, tags=["Card"])
+async def add_card(
+    card: schemas.CardBase,
+    deck_id: int,
+    current_user: Annotated[schemas.User, Depends(services.get_current_user)],
+    db: Session = Depends(services.get_db)
+)-> schemas.Card:
+    """
+    Cette route permet d'ajouter une carte à un deck
+    @param card: schemas.CardBase
+    @param deck_id: int
+    @param current_user: schemas.User
+    @param db: Session
+    @return schemas.Card
+    """
+    return await services.add_card(db, card, deck_id)
+
+# --- Train
+# fonction pour récupérer les cartes d'un deck spécifique aléatoirement
+@app.get("/getRandomCard/{deck_id}", response_model=schemas.Card, tags=["Train"])
+async def read_random_card(
+    deck_id: int,
+    current_user: Annotated[schemas.User, Depends(services.get_current_user)],
+    db: Session = Depends(services.get_db),
+)-> schemas.Card:
+    """
+    Cette route permet de récupérer une carte aléatoire d'un deck
+    @param deck_id: int
+    @param current_user: schemas.User
+    @param db: Session
+    @return schemas.Card
+    """
+    return await services.get_random_card(db, deck_id, current_user)

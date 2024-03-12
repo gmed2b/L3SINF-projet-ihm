@@ -1,23 +1,5 @@
 import requests
-
-API_BASE_URL = "http://127.0.0.1:8000" 
-
-
-def check_server_status():
-    response = requests.get(f"{API_BASE_URL}/")
-    if response.status_code == 200:
-        print("Le serveur est en ligne.")
-    else:
-        print("Le serveur est hors ligne.")
-
-
-def get_unix_times():
-    response = requests.get(f"{API_BASE_URL}/unixTimes")
-    if response.status_code == 200:
-        unix_times = response.json()
-        print("Temps UNIX:", unix_times)
-    else:
-        print("Impossible de récupérer le temps UNIX.")
+from functions import check_server_status, get_unix_times
 
 def main():
     print("Bienvenue dans le CLI de l'API NotaBene.")

@@ -66,3 +66,8 @@ Nous avons créer des maquettes pour notre application, UI et UX ; vous pouvez l
 4. Lancer la commande `make run-api` à la racine du projet
 5. Lancer l'application flet avec la commande `make run-ihm` à la racine du projet
 6. Lancer la CLI `cd cli && python3 main.py`
+
+### Aide 
+Nous pouvons tester la connexion à la base de données avec `psql -h localhost -p 5432 -U name_user -d name_db` 
+
+Verifier que vous n'avez pas d'autre service qui utilise le port 5432.

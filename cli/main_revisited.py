@@ -1,27 +1,32 @@
 import requests
-from functions import load_previous_token,check_server_status, get_unix_times, login, get_user_info, add_deck, get_all_decks, get_deck, add_card, update_state_card, get_random_card
+from functions import check_server_status, get_unix_times, login, get_user_info, add_deck, get_all_decks, get_deck, add_card, update_state_card, get_random_card
+from api_service import ApiService
 
 def main():
-    print("Bienvenue dans le CLI de l'API NotaBene.")
+    print("Bienvenue dans le CLI de l'API NotaBene.\n")
 
-    load_previous_token()
+    apiService = ApiService()
 
+    # 1 - Se connecter
+    print("Veuillez vous connecter.")
+    username = input("Entrez votre email : ")
+    password = input("Entrez votre mot de passe : ")
+
+    apiService.login(username, password)
+
+    # 2 - Afficher le menu
     while True:
-        print("\nQue souhaitez-vous faire ?")
-        print("1. Vérifier l'état du serveur")
-        print("2. Récupérer les temps UNIX")
-        print("3. Se connecter")
-        print("4. Récupérer les informations de l'utilisateur")
-        print("5. Ajouter un deck")
-        print("6. Récupérer l'ensemble de vos decks")
-        print("7. Récupérer un deck en particulier")
-        print("8. Ajouter une carte à un deck")
-        print("10. Entraine toi ! ")
+        print("Que souhaitez-vous faire ?")
+        print("1. Entraine toi ! ")
+        print("2. Récupérer les informations de l'utilisateur")
+        print("3. Ajouter un deck")
+        print("4. Récupérer l'ensemble de vos decks")
+        print("5. Récupérer un deck en particulier")
+        print("6. Ajouter une carte à un deck")
         # print("10.A . Modifier l'état d'une carte")
         # print("10.B . Tire une carte aléatoirement")
 
         choice = input("Entrez le numéro de l'action souhaitée : ")
-        print("")
 
         if choice == "1":
             check_server_status()
@@ -66,9 +71,6 @@ def main():
                 print("Choix invalide. Veuillez entrer 'oui ou 'non'.")
         else:
             print("Choix invalide. Veuillez entrer un numéro valide.")
-
-        print("")
-        input("Appuyez sur Entrée pour continuer...")
 
 
 if __name__ == "__main__":

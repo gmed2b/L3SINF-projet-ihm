@@ -1,7 +1,13 @@
 .DS_Store
+
+.env
+
 # API
 api/venv
 api/.DS_Store
 api/venv/*
 
-.env
+# CLI
+
+cli/token.txt
+

@@ -1,6 +1,30 @@
-import requests
+import requests, json
 
-API_BASE_URL = "http://127.0.0.1:8000" 
+API_BASE_URL = "http://127.0.0.1:8000"
+HEADER = {"Content-Type": "application/json"}
+
+
+def load_previous_token():
+    """
+    Charge le token précédemment utilisé.
+    """
+    try:
+        with open("token.txt", "r") as file:
+            token = file.read()
+            HEADER["Authorization"] = f"Bearer {token}"
+            print("Token chargé avec succès.")
+    except FileNotFoundError:
+        print("Aucun token n'a été trouvé.")
+
+
+def save_token(token):
+    """
+    Sauvegarde le token dans un fichier.
+    """
+    with open("token.txt", "w") as file:
+        file.write(token)
+        print("Token sauvegardé avec succès.")
+
 
 def check_server_status():
     """
@@ -29,11 +53,11 @@ def login(username, password):
     Authentifie l'utilisateur et récupère le token, modifie la variable globale TOKEN avec un effet de bord.
     """
     response = requests.post(f"{API_BASE_URL}/token", data={"username": username, "password": password})
-    access_token = response.json()["access_token"]
     if response.status_code == 200:
-        with open("db.txt", "w") as file:
-            file.write(access_token)
-  
+        access_token = response.json()["access_token"]
+        HEADER["Authorization"] = f"Bearer {access_token}"
+        save_token(access_token)
+
         print("Authentification réussie. \nVotre token est:", access_token)
     else:
         print("Authentification échouée. ", response.json()["detail"])
@@ -42,7 +66,7 @@ def get_user_info():
     """
     Récupère les informations de l'utilisateur.
     """
-    response = requests.get(f"{API_BASE_URL}/users/me",headers = HEADER) 
+    response = requests.get(f"{API_BASE_URL}/users/me",headers = HEADER)
     if response.status_code == 200:
         user_info = response.json()
         print("Informations de l'utilisateur:", user_info)
@@ -53,11 +77,13 @@ def add_deck(deck_name):
     """
     Ajoute un deck.
     """
-    response = requests.post(f"{API_BASE_URL}/addDeck", headers = HEADER)
-    if response.status_code == 201:
+    response = requests.post(f"{API_BASE_URL}/addDeck", headers = HEADER, json={
+        "name": deck_name
+    })
+    if response.status_code == 200:
         print("Deck ajouté avec succès.")
     else:
-        print("Impossible d'ajouter le deck.")
+        print("Impossible d'ajouter le deck.", response.json())
 
 def get_all_decks():
     """
@@ -66,7 +92,7 @@ def get_all_decks():
     response = requests.get(f"{API_BASE_URL}/getAllDecks", headers = HEADER)
     if response.status_code == 200:
         decks = response.json()
-        print("Decks:", decks)
+        print("Decks:", json.dumps(decks, indent=4))
     else:
         print("Impossible de récupérer les decks.")
 
@@ -77,7 +103,7 @@ def get_deck(deck_id):
     response = requests.get(f"{API_BASE_URL}/getDeck/{deck_id}", headers = HEADER)
     if response.status_code == 200:
         deck = response.json()
-        print("Deck:", deck)
+        print("Deck:", json.dumps(deck, indent=4))
     else:
         print("Impossible de récupérer le deck.")
 
@@ -85,8 +111,13 @@ def add_card(deck_id, front_content, back_content):
     """
     Ajoute une carte à un deck.
     """
-    response = requests.post(f"{API_BASE_URL}/addCard", headers = HEADER, json={"deck_id": deck_id, "front_content": front_content, "back_content": back_content})
-    if response.status_code == 201:
+    response = requests.post(
+        f"{API_BASE_URL}/addCard",
+        headers = HEADER,
+        params={"deck_id": deck_id},
+        json={"front_content": front_content, "back_content": back_content}
+    )
+    if response.status_code == 200:
         print("Carte ajoutée avec succès.")
     else:
         print("Impossible d'ajouter la carte.")

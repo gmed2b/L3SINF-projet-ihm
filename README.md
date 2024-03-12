@@ -42,6 +42,7 @@ Nous avons créer des maquettes pour notre application, UI et UX ; vous pouvez l
 ├── README.md
 ├── ihm
 ├── api
+├── cli
 ├── assets
 │   ├── diagrammes
 │   └── maquettes
@@ -50,6 +51,7 @@ Nous avons créer des maquettes pour notre application, UI et UX ; vous pouvez l
 ```
 
 - `api` : Dossier contenant l'API
+- `cli` : Dossier contenant la CLI
 - `assets` : Dossier contenant les assets du projet
   - `diagrammes` : Dossier contenant les diagrammes du projet (cas d'utilisation, couverture minimal et MCD)
   - `maquettes` : Dossier contenant les maquettes du projet (UI, UX)
@@ -63,3 +65,4 @@ Nous avons créer des maquettes pour notre application, UI et UX ; vous pouvez l
 3. Créer un fichier `.env` à la racine du projet en suivant le fichier `exemple.env`
 4. Lancer la commande `make run-api` à la racine du projet
 5. Lancer l'application flet avec la commande `make run-ihm` à la racine du projet
+6. Lancer la CLI `cd cli && python3 main.py`

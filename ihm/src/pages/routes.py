@@ -1,0 +1,5 @@
+
+
+ROUTES = {
+    "landing-page": "/"
+}

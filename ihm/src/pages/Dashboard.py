@@ -3,9 +3,7 @@ import flet as ft
 class DashboardPage(ft.View):
 
     def __init__(self, page: ft.Page):
-        super(DashboardPage, self).__init__(
-            route="/dashboard",
-        )
+        super(DashboardPage, self).__init__()
         self.page = page
         self.page.title = "Dashboard page"
 
@@ -38,4 +36,4 @@ class DashboardPage(ft.View):
 
 
     def handle_logout(self, _):
-        self.page.go("/landing")
+        self.page.go("/")

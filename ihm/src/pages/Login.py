@@ -4,7 +4,6 @@ class LoginPage(ft.View):
 
     def __init__(self, page: ft.Page):
         super(LoginPage, self).__init__(
-            route="/login",
             horizontal_alignment="center",
             padding=ft.padding.symmetric(horizontal=40),
         )

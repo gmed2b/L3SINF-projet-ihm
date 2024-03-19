@@ -11,19 +11,17 @@ class LoginPage(ft.View):
         self.page.title = "Login page"
 
         self.controls = [
-            ft.Row(
-                controls=[
-                    ft.IconButton(
-                        icon=ft.icons.ARROW_BACK,
-                        on_click=lambda e: self.page.go("/"),
-                    )
-                ]
-            ),
             ft.Column(
                 controls=[
                     ft.Container(
                         content=ft.Text("NotaBene", size=30),
                         padding=ft.padding.symmetric(vertical=50),
+                    ),
+                    ft.Image(
+                        src=f"/Login.png",
+                        width="100vw",
+                        height="100vh",
+                        fit=ft.ImageFit.CONTAIN,
                     ),
                     ft.CupertinoTextField(
                         placeholder_text="Email",
@@ -33,7 +31,8 @@ class LoginPage(ft.View):
                     ),
 
                     ft.ElevatedButton("Se connecter", on_click=self.handle_login),
-                ]
+                ],
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             )
         ]
 

@@ -29,5 +29,13 @@ class DashboardPage(ft.View):
             ft.Container(
                 content=ft.Text("Dashboard", size=30),
                 padding=ft.padding.symmetric(vertical=50),
+            ),
+            ft.CupertinoButton(
+                text="Logout",
+                on_click=self.handle_logout,
             )
         ]
+
+
+    def handle_logout(self, _):
+        self.page.go("/landing")

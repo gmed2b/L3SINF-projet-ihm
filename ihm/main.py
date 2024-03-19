@@ -1,31 +1,28 @@
 import flet as ft
-from src.pages import Landing, Login, Dashboard
+from src.routes import ROUTES
 
 def main(page: ft.Page):
     page.title = "NotaBene"
     page.theme_mode = ft.ThemeMode.LIGHT
     page.theme = ft.Theme(color_scheme_seed="green")
 
-    def route_change(e: ft.RouteChangeEvent):
+    def route_change(route):
         page.views.clear()
-
-        if e.route == "/":
-            page.views.append(
-                Landing.LandingPage(page)
-            )
-        elif e.route == "/login":
-            page.views.append(
-                Login.LoginPage(page)
-            )
-        elif e.route == "/dashboard":
-            page.views.append(
-                Dashboard.DashboardPage(page)
-            )
-
+        for route in ROUTES:
+            if route == page.route:
+                page.views.append(ROUTES[route](page))
         page.update()
 
+
+    def view_pop(view):
+        page.views.pop()
+        top_view = page.views[-1]
+        page.go(top_view.route)
+
+
     page.on_route_change = route_change
-    page.go("/")
+    page.on_view_pop = view_pop
+    page.go(page.route)
 
 
 ft.app(main)

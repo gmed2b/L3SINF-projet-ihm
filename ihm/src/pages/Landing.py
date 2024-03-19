@@ -6,7 +6,7 @@ class LandingPage(ft.View):
 
     def __init__(self, page: ft.Page):
         super(LandingPage, self).__init__(
-            route="/",
+            route="/landing",
             horizontal_alignment="center",
             padding=ft.padding.symmetric(horizontal=40),
         )

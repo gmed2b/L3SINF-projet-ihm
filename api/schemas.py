@@ -30,7 +30,7 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # --- Card schemas
 class CardBase(BaseModel):
@@ -46,7 +46,7 @@ class Card(CardBase):
     deck_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # --- Tag schemas
 class TagBase(BaseModel):
@@ -59,7 +59,7 @@ class Tag(TagBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # --- Deck schemas
 class DeckBase(BaseModel):
@@ -77,7 +77,7 @@ class Deck(DeckBase):
     owner_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # --- DeckProgress schemas
 class DeckProgressBase(BaseModel):
@@ -91,7 +91,7 @@ class DeckProgress(DeckProgressBase):
     deck_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # --- UserDeck schemas
 class UserDeckBase(BaseModel):
@@ -103,4 +103,4 @@ class UserDeckCreate(UserDeckBase):
 
 class UserDeck(UserDeckBase):
     class Config:
-        orm_mode = True
+        from_attributes = True

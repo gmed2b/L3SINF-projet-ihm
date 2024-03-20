@@ -52,6 +52,7 @@ def main():
             back_content = input("Entrez la réponse de la carte : ")
             add_card(deck_id, front_content, back_content)
         elif choice == "10":
+            deck_id = input("Entrez l'ID du deck à réviser : ")
             card = get_random_card(deck_id)
             print(card.get("front_content"))
             print("Voulez-vous voir la réponse ?")
@@ -61,7 +62,6 @@ def main():
                 print("La carte a-t-elle été mémorisée ?")
                 response = input("Entrez 'not memorized' ou 'in progress' ou 'memorized: ")
                 update_state_card(card.get("id"), response)
-                print("État de la carte mis à jour avec succès.")
             else:
                 print("Choix invalide. Veuillez entrer 'oui ou 'non'.")
         else:

@@ -126,7 +126,7 @@ def update_state_card(card_id, new_state):
     """
     Met à jour l'état d'une carte.
     """
-    response = requests.put(f"{API_BASE_URL}/updateStateCard/{card_id}", headers = HEADER, json={"new_state": new_state})
+    response = requests.put(f"{API_BASE_URL}/updateCard/{card_id}", headers = HEADER, json={"new_state": new_state})
     if response.status_code == 200:
         print("État de la carte mis à jour avec succès.")
     else:
@@ -134,12 +134,13 @@ def update_state_card(card_id, new_state):
 
 def get_random_card(deck_id):
     """
-    Récupère une carte aléatoire d'un deck.
+    Récupère une carte aléatoire.
     """
     response = requests.get(f"{API_BASE_URL}/getRandomCard/{deck_id}", headers = HEADER)
     if response.status_code == 200:
         card = response.json()
-        print("Carte aléatoire:")
         return card
     else:
-        print("Impossible de récupérer la carte aléatoire.")
+        print("Impossible de récupérer une carte aléatoire.")
+        return None
+    

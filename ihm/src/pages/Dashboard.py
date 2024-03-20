@@ -17,14 +17,6 @@ class DashboardPage(ft.View):
                 padding=ft.padding.symmetric(vertical=50),
             ),
             ft.Row(
-                controls=[
-                    ft.Container(
-                        bgcolor=ft.colors.GREEN_ACCENT_700,
-                        height=2,
-                    )
-                ]
-            )
-            ft.Row(
                 alignment=ft.MainAxisAlignment.CENTER,
                 controls=[
                     ft.Card(
@@ -54,6 +46,5 @@ class DashboardPage(ft.View):
                         bgcolor=ft.colors.GREEN_ACCENT_700,
                     ),
                 ]
-            ),
-            
+            ),  
         ]

@@ -1,6 +1,6 @@
 # --- Importation des modules
 # -- Fast API 
-from fastapi import FastAPI, HTTPException, status, Depends
+from fastapi import FastAPI, HTTPException, status, Depends, APIRouter
 # OAuth2PasswordBearer est utilisé pour la gestion de l'authentification, OAuth2PasswordRequestForm est utilisé pour la gestion de la requête d'authentification
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 # CORS est utilisé pour la gestion des requêtes CORS 
@@ -42,6 +42,7 @@ app = FastAPI(
     title="NotaBene API",
     description="This is the API documentation for the NotaBene project ✨📚",
 )
+auth_router = APIRouter()
 
 # Migration de la base de données
 services.create_database()
@@ -60,9 +61,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- Configuration de l'authentification
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+# Créer une instance de OAuth2PasswordBearer avec l'URL personnalisée
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+@auth_router.post("/token")
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(services.get_db)) -> schemas.Token:
+    """
+    Cette route permet de se connecter et de récupérer un token d'accès, à noter qu'ici : username = email
+    @param form_data: OAuth2PasswordRequestForm
+    @param db: Session
+    @return schemas.Token
+    """
+    return await services.authenticate_user(db, form_data.username, form_data.password)
+
+# --- Utiliser le routeur d'authentification dans l'application principale
+app.include_router(auth_router)
 # --- Routes
 # --- Server 
 @app.get("/", tags=["Server"])
@@ -81,20 +94,19 @@ async def read_item():
     return {"unixTime": unix_timestamp} 
 
 # --- Users 
-@app.post("/token", response_model=schemas.Token, tags=["Users"])
-async def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(),
+@app.get("/users/", response_model=list[schemas.User], tags=["Users"])
+async def read_users(
+    current_user: Annotated[schemas.User, Depends(services.get_current_user)],
     db: Session = Depends(services.get_db)
-)-> schemas.Token:
+)-> list[schemas.User]:
     """
-    Cette route permet de se connecter et de récupérer un token d'accès, à noter qu'ici : username = email
-    @param form_data: OAuth2PasswordRequestForm
+    Cette route permet de récupérer tous les utilisateurs
     @param db: Session
-    @return schemas.Token
+    @return list[schemas.User]
     """
-    return await services.authenticate_user(db, form_data.username, form_data.password)
+    return await services.get_all_users(db)
 
-@app.post("/addUser/", response_model=schemas.User, tags=["Users"])
+@app.post("/users/", response_model=schemas.User, tags=["Users"])
 async def add_user(
     user: schemas.UserCreate,
     db: Session = Depends(services.get_db)
@@ -107,40 +119,42 @@ async def add_user(
     """
     return await services.add_user(db, user)
 
-@app.get("/getAllUsers/", response_model=list[schemas.User], tags=["Users"])
-async def read_users(
-    db: Session = Depends(services.get_db)
-)-> list[schemas.User]:
-    """
-    Cette route permet de récupérer tous les utilisateurs
-    @param db: Session
-    @return list[schemas.User]
-    """
-    return await services.get_all_users(db)
-
 @app.get("/users/me/", response_model=schemas.User, tags=["Users"])
 async def read_users_me(
     current_user: Annotated[schemas.User, Depends(services.get_current_user)]
 ):
     return current_user
 
-# --- Deck
-@app.post("/addDeck/", response_model=schemas.Deck, tags=["Deck"])
-async def add_deck(
-    deck: schemas.DeckBase,
+@app.post("/users/login", response_model=schemas.Token, tags=["Users"])
+async def login_for_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(services.get_db)
+)-> schemas.Token:
+    """
+    Cette route permet de se connecter et de récupérer un token d'accès, à noter qu'ici : username = email
+    @param form_data: OAuth2PasswordRequestForm
+    @param db: Session
+    @return schemas.Token
+    """
+    return await services.authenticate_user(db, form_data.username, form_data.password)
+
+@app.post("/users/follow/", response_model=schemas.User, tags=["Users"])
+async def follow(
+    user_id: int,
     current_user: Annotated[schemas.User, Depends(services.get_current_user)],
     db: Session = Depends(services.get_db)
-)-> schemas.Deck:
+)-> schemas.User:
     """
-    Cette route permet d'ajouter un deck
-    @param deck: schemas.DeckBase
+    Cette fonction permet de suivre un utilisateur
+    @param user_id: int
     @param current_user: schemas.User
     @param db: Session
-    @return schemas.Deck
+    @return schemas.User
     """
-    return await services.add_deck(db, deck, current_user)
+    return await services.follow(db, user_id, current_user)
 
-@app.get("/getAllDecks/", response_model=list[schemas.Deck], tags=["Deck"])
+# --- Deck
+@app.get("/decks/", response_model=list[schemas.Deck], tags=["Deck"])
 async def read_decks(
     current_user: Annotated[schemas.User, Depends(services.get_current_user)],
     db: Session = Depends(services.get_db)
@@ -153,7 +167,7 @@ async def read_decks(
     """
     return await services.get_decks(db, current_user)
 
-@app.get("/getDeck/{deck_id}", response_model=schemas.Deck, tags=["Deck"])
+@app.get("/decks/{deck_id}", response_model=schemas.Deck, tags=["Deck"])
 async def read_deck(
     deck_id: int,
     current_user: Annotated[schemas.User, Depends(services.get_current_user)],
@@ -168,8 +182,23 @@ async def read_deck(
     """
     return await services.get_deck(db, deck_id, current_user)
 
-# --- Card
-@app.post("/addCard/", response_model=schemas.Card, tags=["Card"])
+@app.post("/decks/", response_model=schemas.Deck, tags=["Deck"])
+async def add_deck(
+    deck: schemas.DeckBase,
+    current_user: Annotated[schemas.User, Depends(services.get_current_user)],
+    db: Session = Depends(services.get_db)
+)-> schemas.Deck:
+    """
+    Cette route permet d'ajouter un deck
+    @param deck: schemas.DeckBase
+    @param current_user: schemas.User
+    @param db: Session
+    @return schemas.Deck
+    """
+    return await services.add_deck(db, deck, current_user)
+
+# --- Cards
+@app.post("/cards/", response_model=schemas.Card, tags=["Card"])
 async def add_card(
     card: schemas.CardBase,
     deck_id: int,
@@ -186,7 +215,7 @@ async def add_card(
     """
     return await services.add_card(db, card, deck_id)
 
-@app.put("/updateCard/{card_id}", response_model=schemas.Card, tags=["Card"])
+@app.patch("/cards/{card_id}", response_model=schemas.Card, tags=["Card"])
 async def update_card(
     card_id: int,
     current_user: Annotated[schemas.User, Depends(services.get_current_user)],
@@ -204,7 +233,7 @@ async def update_card(
     return await services.update_card(db, card_id, state, current_user)
 
 # --- Train
-@app.get("/getRandomCard/{deck_id}", response_model=schemas.Card, tags=["Train"])
+@app.get("/train/radom/{deck_id}", response_model=schemas.Card, tags=["Train"])
 async def read_random_card(
     deck_id: int,
     current_user: Annotated[schemas.User, Depends(services.get_current_user)],

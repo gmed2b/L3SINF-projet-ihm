@@ -80,6 +80,21 @@ async def authenticate_user(db: Session, email: str, password: str):
     access_token = tasks.create_access_token(data={"sub": user.email})
     return {"access_token": access_token, "token_type": "bearer"}
 
+async def follow(db: Session, user_id: int, current_user: models.User) -> models.User:
+    """
+    Cette fonction permet de suivre un utilisateur
+    @param db: Session
+    @param user_id: int
+    @param current_user: models.User
+    @return models.User
+    """
+    friend = db.query(models.User).filter(models.User.id == user_id).first()
+    if friend is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    current_user.following.append(friend)
+    db.commit()
+    db.refresh(current_user)
+    return current_user
 
 async def get_current_user(
     db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
@@ -156,14 +171,20 @@ async def get_decks(db: Session, user: models.User) -> list:
 
 async def get_deck(db: Session, deck_id: int, user: models.User) -> models.Deck:
     """
-    Cette fonction permet de récupérer un deck spécifique
+    Cette fonction permet de récupérer un deck spécifique 
     @param db: Session
     @param deck_id: int
     @param user: models.User
     @return models.Deck
     """
+    # s'il n'est pas dans deck_progress de l'utilisateur
+    # if deck_id not in [deck_progress.deck_id for deck_progress in user.deck_progress]:
+    #     raise HTTPException(status_code=404, detail="Deck not found")
+
+    # s'il n'est pas dans les decks de l'utilisateur
     if deck_id not in [deck.id for deck in user.decks]:
         raise HTTPException(status_code=404, detail="Deck not found")
+
     return db.query(models.Deck).filter(models.Deck.id == deck_id).first()
 
 

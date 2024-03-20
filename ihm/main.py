@@ -25,4 +25,13 @@ def main(page: ft.Page):
     page.go("/")
 
 
+<<<<<<< HEAD
 ft.app(port=8550, target=main, view=ft.AppView.WEB_BROWSER, assets_dir="assets")
+=======
+ft.app(
+    port=8550,
+    target=main,
+    view=ft.AppView.WEB_BROWSER,
+    assets_dir="assets"
+)
+>>>>>>> a22ebd6 (new: navigation bottom bar, profile page components)

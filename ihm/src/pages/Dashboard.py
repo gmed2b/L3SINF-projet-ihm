@@ -12,12 +12,37 @@ class DashboardPage(ft.View):
 
         self.controls = [
             ft.Container(
-                content=ft.Text("Dashboard", size=30),
+                alignment=ft.alignment.center,
+                content=ft.Text("P.O.O", size=60),
                 padding=ft.padding.symmetric(vertical=50),
             ),
+            ft.Row(
+                alignment=ft.MainAxisAlignment.CENTER,
+                controls=[
+                    ft.Card(
+                        content=ft.Container(
+                        content=ft.Column(
+                            [
+                                ft.ListTile(
+                                    title=ft.Text("Polymorphisme"),
+                                    subtitle=ft.Text(),
+                                ),
+                                ft.Row(
+                                    # [ft.TextButton("Buy tickets"), ft.TextButton("Listen")],
+                                    alignment=ft.MainAxisAlignment.END,
+                                ),
+                            ]
+                        ),
+                        width=400,
+                        padding=100,
+                    ),
+        )
+                # padding=ft.padding.symmetric(vertical=20),
+
+                ]
+            ),
             ft.CupertinoButton(
-                "Se déconnecter",
-                bgcolor=ft.colors.RED_ACCENT,
+                "Révéler",
+                bgcolor=ft.colors.GREEN_ACCENT_100,
             ),
         ]
-

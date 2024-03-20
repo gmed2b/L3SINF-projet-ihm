@@ -17,32 +17,43 @@ class DashboardPage(ft.View):
                 padding=ft.padding.symmetric(vertical=50),
             ),
             ft.Row(
+                controls=[
+                    ft.Container(
+                        bgcolor=ft.colors.GREEN_ACCENT_700,
+                        height=2,
+                    )
+                ]
+            )
+            ft.Row(
                 alignment=ft.MainAxisAlignment.CENTER,
                 controls=[
                     ft.Card(
                         content=ft.Container(
-                        content=ft.Column(
-                            [
-                                ft.ListTile(
-                                    title=ft.Text("Polymorphisme"),
-                                    subtitle=ft.Text(),
-                                ),
-                                ft.Row(
-                                    # [ft.TextButton("Buy tickets"), ft.TextButton("Listen")],
-                                    alignment=ft.MainAxisAlignment.END,
-                                ),
-                            ]
+                            padding=60,
+                            content=ft.Container(
+                                content=ft.Text("Polymorphisme", size=18),
+                                margin=10,
+                                padding=10,
+                                alignment=ft.alignment.center,
+                                width=150,
+                                height=150,
+                                border_radius=10,
+                            ),
                         ),
-                        width=400,
-                        padding=100,
-                    ),
-        )
+                    )
                 # padding=ft.padding.symmetric(vertical=20),
 
                 ]
             ),
-            ft.CupertinoButton(
-                "Révéler",
-                bgcolor=ft.colors.GREEN_ACCENT_100,
+
+            ft.Row(
+                alignment=ft.MainAxisAlignment.CENTER,
+                controls=[
+                    ft.CupertinoButton(
+                        "Révéler",
+                        bgcolor=ft.colors.GREEN_ACCENT_700,
+                    ),
+                ]
             ),
+            
         ]

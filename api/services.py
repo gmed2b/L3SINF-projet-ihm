@@ -138,9 +138,14 @@ async def add_deck(db: Session, deck: schemas.DeckCreate, user: models.User) -> 
         color=deck.color,
         owner_id=user.id
     )
+
     db.add(db_deck)
     db.commit()
     db.refresh(db_deck)
+
+    print(f" user deck : {user.deck}")
+    if user.decks is None or len(user.decks) == 0:
+        user.current_deck_id = db_deck.id
 
     # ajoute le deck à la liste des decks de l'utilisateur
     user.decks.append(db_deck)

@@ -15,6 +15,7 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     password = Column(String) 
     rgpd = Column(Boolean)
+    active_deck_id = Column(Integer, ForeignKey("Decks.id"))
 
     # Relation: Un utilisateur peut suivre plusieurs autres utilisateurs
     following = relationship("User", secondary="user_followers", 
@@ -23,13 +24,16 @@ class User(Base):
                              backref="followers")
     
     # Relation: Un utilisateur peut posséder plusieurs decks)
-    decks = relationship("Deck", back_populates="owner") 
+    decks = relationship("Deck", back_populates="owner", 
+                         primaryjoin="User.id==Deck.owner_id") 
 
     # Relation: La progression du deck spécifique à chaque utilisateur
     deck_progress = relationship("DeckProgress", back_populates="user")
 
 
+
 #--- Deck
+# --- Deck
 class Deck(Base):
     __tablename__ = "Decks"
     id = Column(Integer, primary_key=True, index=True)
@@ -39,7 +43,8 @@ class Deck(Base):
 
     # Relation: Un deck peut être possédé par plusieurs utilisateurs
     owner_id = Column(Integer, ForeignKey("Users.id"))
-    owner = relationship("User", back_populates="decks")
+    owner = relationship("User", back_populates="decks", 
+                        primaryjoin="Deck.owner_id==User.id")  # Spécifier la jointure explicite ici
     # Relation: Un deck peut contenir plusieurs cartes
     cards = relationship("Card", back_populates="deck")
     # Relation: Un deck est associé à un seul tag
@@ -48,6 +53,7 @@ class Deck(Base):
 
     # Relation: La progression du deck spécifique à chaque utilisateur
     user_progress = relationship("DeckProgress", back_populates="deck")
+
 
 
 #--- Card

@@ -22,6 +22,7 @@ class UserBase(BaseModel):
     following: List["User"] = []
     decks: List["Deck"] = []
     deck_progress: List["DeckProgress"] = []
+    active_deck_id: Optional[int] = None
     
 # UserCreate est utilisé pour la création d'un utilisateur, il contient un champ password + les champs de UserBase
 class UserCreate(UserBase):

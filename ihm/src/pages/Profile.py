@@ -160,6 +160,11 @@ class ProfilePage(ft.View):
             self.page.update()
 
 
+    def goto_edit_deck(self, deck_id: int):
+        self.page.client_storage.set("editing_deck_id", deck_id)
+        self.page.go("/edit")
+
+
     def fill_user_decks(self):
         user_decks = self.fetch_user_decks()
 
@@ -188,7 +193,8 @@ class ProfilePage(ft.View):
         if user_decks and len(user_decks) > 0:
             return [
                 ft.Container(
-                    on_click=lambda e: self.page.go("/edit"),
+                    data=deck["id"],
+                    on_click=lambda e: self.goto_edit_deck(e.control.data),
                     content=ft.Card(
                         color=deck["color"],
                         content=ft.Container(

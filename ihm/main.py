@@ -8,8 +8,9 @@ def main(page: ft.Page):
     page.theme = ft.Theme(color_scheme_seed="green")
 
     def route_change(e: ft.RouteChangeEvent):
-        verify_token()
         page.views.clear()
+        verify_token()
+
         for route in ROUTES:
             if e.route == route:
                 page.views.append(ROUTES[route](page))

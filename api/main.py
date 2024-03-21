@@ -1,6 +1,6 @@
 # --- Importation des modules
 # -- Fast API 
-from fastapi import FastAPI, HTTPException, status, Depends, APIRouter
+from fastapi import FastAPI, Depends
 # OAuth2PasswordBearer est utilisé pour la gestion de l'authentification, OAuth2PasswordRequestForm est utilisé pour la gestion de la requête d'authentification
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 # CORS est utilisé pour la gestion des requêtes CORS 
@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # --- SQLAlchemy
 from sqlalchemy.orm import Session
 # datetime est utilisé pour la gestion des dates
-from datetime import datetime, timedelta
+from datetime import datetime
 # typing.Annotated est utilisé pour la gestion des annotations
 from typing import Annotated
 import schemas, services
@@ -42,7 +42,6 @@ app = FastAPI(
     title="NotaBene API",
     description="This is the API documentation for the NotaBene project ✨📚",
 )
-auth_router = APIRouter()
 
 # Migration de la base de données
 services.create_database()
@@ -64,18 +63,7 @@ app.add_middleware(
 
 # Créer une instance de OAuth2PasswordBearer avec l'URL personnalisée
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-@auth_router.post("/token")
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(services.get_db)) -> schemas.Token:
-    """
-    Cette route permet de se connecter et de récupérer un token d'accès, à noter qu'ici : username = email
-    @param form_data: OAuth2PasswordRequestForm
-    @param db: Session
-    @return schemas.Token
-    """
-    return await services.authenticate_user(db, form_data.username, form_data.password)
 
-# --- Utiliser le routeur d'authentification dans l'application principale
-app.include_router(auth_router)
 # --- Routes
 # --- Server 
 @app.get("/", tags=["Server"])
@@ -94,6 +82,20 @@ async def read_item():
     return {"unixTime": unix_timestamp} 
 
 # --- Users 
+# On ne peut pas changer le nom de la route, c'est une route prédéfinie par FastAPI
+@app.post("/token", response_model=schemas.Token, tags=["Users"])
+async def login_for_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(services.get_db)
+)-> schemas.Token:
+    """
+    Cette route permet de se connecter et de récupérer un token d'accès, à noter qu'ici : username = email
+    @param form_data: OAuth2PasswordRequestForm
+    @param db: Session
+    @return schemas.Token
+    """
+    return await services.authenticate_user(db, form_data.username, form_data.password)
+
 @app.get("/users/", response_model=list[schemas.User], tags=["Users"])
 async def read_users(
     current_user: Annotated[schemas.User, Depends(services.get_current_user)],
@@ -124,19 +126,6 @@ async def read_users_me(
     current_user: Annotated[schemas.User, Depends(services.get_current_user)]
 ):
     return current_user
-
-@app.post("/users/login", response_model=schemas.Token, tags=["Users"])
-async def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(services.get_db)
-)-> schemas.Token:
-    """
-    Cette route permet de se connecter et de récupérer un token d'accès, à noter qu'ici : username = email
-    @param form_data: OAuth2PasswordRequestForm
-    @param db: Session
-    @return schemas.Token
-    """
-    return await services.authenticate_user(db, form_data.username, form_data.password)
 
 @app.post("/users/follow/", response_model=schemas.User, tags=["Users"])
 async def follow(

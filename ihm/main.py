@@ -7,12 +7,11 @@ def main(page: ft.Page):
     page.theme_mode = ft.ThemeMode.LIGHT
     page.theme = ft.Theme(color_scheme_seed="green")
 
-    def route_change(route):
+    def route_change(e: ft.RouteChangeEvent):
         verify_token()
-
         page.views.clear()
         for route in ROUTES:
-            if route == page.route:
+            if e.route == route:
                 page.views.append(ROUTES[route](page))
         page.update()
 

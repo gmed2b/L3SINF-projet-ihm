@@ -187,35 +187,38 @@ class ProfilePage(ft.View):
 
         if user_decks and len(user_decks) > 0:
             return [
-                ft.Card(
-                    color=deck["color"],
-                    content=ft.Container(
-                        padding=ft.padding.all(10),
-                        content=ft.Column(
-                            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                            controls=[
-                                ft.Row([
-                                    VisibilityCard(deck["visibility"]),
-                                ]),
-                                ft.Row(
-                                    alignment=ft.MainAxisAlignment.CENTER,
-                                    controls=[
+                ft.Container(
+                    on_click=lambda e: self.page.go("/edit"),
+                    content=ft.Card(
+                        color=deck["color"],
+                        content=ft.Container(
+                            padding=ft.padding.all(10),
+                            content=ft.Column(
+                                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                                controls=[
+                                    ft.Row([
+                                        VisibilityCard(deck["visibility"]),
+                                    ]),
+                                    ft.Row(
+                                        alignment=ft.MainAxisAlignment.CENTER,
+                                        controls=[
+                                            ft.Text(
+                                                value=deck["name"],
+                                                size=20,
+                                                weight=ft.FontWeight.BOLD,
+                                            ),
+                                        ]
+                                    ),
+                                    ft.Row([
                                         ft.Text(
-                                            value=deck["name"],
-                                            size=20,
-                                            weight=ft.FontWeight.BOLD,
-                                        ),
-                                    ]
-                                ),
-                                ft.Row([
-                                    ft.Text(
-                                        f"{len(deck['cards'])} carte{'s' if len(deck['cards']) > 1 else ''}",
-                                        size=16
-                                    )
-                                ]),
-                            ]
-                        )
-                    ),
+                                            f"{len(deck['cards'])} carte{'s' if len(deck['cards']) > 1 else ''}",
+                                            size=16
+                                        )
+                                    ]),
+                                ]
+                            )
+                        ),
+                    )
                 )
                 for deck in user_decks
             ]

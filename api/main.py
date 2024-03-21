@@ -142,6 +142,22 @@ async def follow(
     """
     return await services.follow(db, user_id, current_user)
 
+@app.patch("/users/active-deck", response_model=schemas.User, tags=["Users"])
+async def set_active_deck(
+    deck_id: int,
+    current_user: Annotated[schemas.User, Depends(services.get_current_user)],
+    db: Session = Depends(services.get_db)
+)-> schemas.User:
+    """
+    Cette route permet de définir un deck actif pour un utilisateur
+    @param user_id: int
+    @param deck_id: int
+    @param current_user: schemas.User
+    @param db: Session
+    @return schemas.User
+    """
+    return await services.set_active_deck(db, deck_id, current_user)
+
 # --- Deck
 @app.get("/decks/", response_model=list[schemas.Deck], tags=["Deck"])
 async def read_decks(
@@ -185,6 +201,25 @@ async def add_deck(
     @return schemas.Deck
     """
     return await services.add_deck(db, deck, current_user)
+
+# update la visibilité du deck
+@app.patch("/decks/visibility/{deck_id}", response_model=schemas.Deck, tags=["Deck"])
+async def update_deck(
+    deck_id: int,
+    current_user: Annotated[schemas.User, Depends(services.get_current_user)],
+    visibility: schemas.Visibility,
+    db: Session = Depends(services.get_db),
+)-> schemas.Deck:
+    """
+    Cette route permet de modifier la visibilité d'un deck
+    @param deck_id: int
+    @param visibility: str
+    @param current_user: schemas.User
+    @param db: Session
+    @return schemas.Deck
+    """
+    return await services.update_deck_visibility(db, deck_id, visibility, current_user)
+
 
 # --- Cards
 @app.post("/cards/", response_model=schemas.Card, tags=["Card"])

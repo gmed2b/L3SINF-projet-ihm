@@ -123,6 +123,19 @@ async def get_current_user(
         raise credentials_exception
     return user
 
+async def set_active_deck(db: Session, deck_id: int, user: models.User) -> models.User:
+    """
+    Cette fonction permet de définir le deck actif d'un utilisateur
+    @param db: Session
+    @param deck_id: int
+    @param user: models.User
+    @return models.User
+    """
+    user.active_deck_id = deck_id
+    db.commit()
+    db.refresh(user)
+    return user
+
 # --- Decks
 async def add_deck(db: Session, deck: schemas.DeckCreate, user: models.User) -> models.Deck:
     """
@@ -138,14 +151,9 @@ async def add_deck(db: Session, deck: schemas.DeckCreate, user: models.User) -> 
         color=deck.color,
         owner_id=user.id
     )
-
     db.add(db_deck)
     db.commit()
     db.refresh(db_deck)
-
-    print(f" user deck : {user.deck}")
-    if user.decks is None or len(user.decks) == 0:
-        user.current_deck_id = db_deck.id
 
     # ajoute le deck à la liste des decks de l'utilisateur
     user.decks.append(db_deck)
@@ -163,6 +171,14 @@ async def add_deck(db: Session, deck: schemas.DeckCreate, user: models.User) -> 
     db.refresh(db_progress)
 
     user.deck_progress.append(db_progress)
+    db.commit()
+    db.refresh(user)
+
+    if len(user.decks) == 1:
+        user.active_deck_id = db_deck.id
+        db.commit()
+        db.refresh(user)
+
     return db_deck
 
 async def get_decks(db: Session, user: models.User) -> list:
@@ -191,6 +207,28 @@ async def get_deck(db: Session, deck_id: int, user: models.User) -> models.Deck:
         raise HTTPException(status_code=404, detail="Deck not found")
 
     return db.query(models.Deck).filter(models.Deck.id == deck_id).first()
+
+# choix de la visibilité du deck
+async def update_deck_visibility(db: Session, deck_id: int, visibility: str, user: models.User) -> models.Deck:
+    """
+    Cette fonction permet de mettre à jour la visibilité d'un deck
+    @param db: Session
+    @param deck_id: int
+    @param visibility: str
+    @param user: models.User
+    @return models.Deck
+    """
+    deck = db.query(models.Deck).filter(models.Deck.id == deck_id).first()
+    if deck is None:
+        raise HTTPException(status_code=404, detail="Deck not found")
+    
+    # Tu dois être le propriétaire du deck pour changer la visibilité
+    if deck.owner_id != user.id:
+        raise HTTPException(status_code=403, detail="You are not the owner of the deck")
+    deck.visibility = visibility
+    db.commit()
+    db.refresh(deck)
+    return deck
 
 
 # --- Cards

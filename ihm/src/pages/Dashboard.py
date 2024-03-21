@@ -10,6 +10,12 @@ class DashboardPage(ft.View):
 
         self.navigation_bar = BottomNavigationBar(self.page, selected_index=1)
 
+        self.page.dialog = ft.AlertDialog(
+            title=ft.Text("Choisissez un deck"),
+            content=ft.Text("La suite en V2"),
+        )
+
+        # Face recto de la carte
         self.FrontCard = ft.Card(
             content=ft.Container(
                 padding=60,
@@ -25,6 +31,7 @@ class DashboardPage(ft.View):
             ),
         )
 
+        # Face verso de la carte
         self.BackCard = ft.Card(
             content=ft.Container(
                 padding=60,
@@ -40,6 +47,7 @@ class DashboardPage(ft.View):
             ),
         )
 
+        # Variable contenant la carte
         self.CardHolder = ft.AnimatedSwitcher(
             content=self.FrontCard,
             transition=ft.AnimatedSwitcherTransition.SCALE,
@@ -49,12 +57,14 @@ class DashboardPage(ft.View):
             switch_out_curve=ft.AnimationCurve.BOUNCE_IN,
         )
 
+        # Bouton pour révéler la carte
         self.RevealButton = ft.CupertinoButton(
             "Révéler",
             bgcolor=ft.colors.GREEN_ACCENT_700,
             on_click=self.animate_card,
         )
 
+        # Variable contenant les boutons "pouce"
         self.ThumbsRow = ft.Row(
             controls=[
                 ft.IconButton(
@@ -78,11 +88,22 @@ class DashboardPage(ft.View):
             ],
         )
 
+        # Variable de gestion des boutons
         self.ButtonHolder = ft.Container(
             content=self.RevealButton,
         )
-        
+
         self.controls = [
+            # Header
+            ft.Row(
+                alignment=ft.MainAxisAlignment.END,
+                controls=[
+                    ft.ElevatedButton(
+                        "Changer de deck",
+                        on_click=self.open_dlg,
+                    )
+                ],
+            ),
             ft.Container(
                 alignment=ft.alignment.center,
                 content=ft.Text("P.O.O", size=60),
@@ -96,16 +117,19 @@ class DashboardPage(ft.View):
                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                         spacing=30,
                         controls=[
-                            self.CardHolder,
-                            self.ButtonHolder,
+                            self.CardHolder, # Carte
+                            self.ButtonHolder, # Bouton(s)
                         ],
                     ),
                 ],
             ),
         ]
 
-
     def animate_card(self, e):
         self.CardHolder.content = self.BackCard if self.CardHolder.content == self.FrontCard else self.FrontCard
         self.ButtonHolder.content = self.RevealButton if self.CardHolder.content == self.FrontCard else self.ThumbsRow
+        self.page.update()
+
+    def open_dlg(self, e):
+        self.page.dialog.open = True
         self.page.update()

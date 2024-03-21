@@ -231,6 +231,53 @@ async def update_deck_visibility(db: Session, deck_id: int, visibility: str, use
     return deck
 
 
+async def copy_deck(db: Session, deck_id: int, user: models.User) -> models.Deck:
+    """
+    Cette fonction permet de copier le deck d'un utilisateur et l'ajouter dans nos decks
+    @param db: Session
+    @param deck_id: int
+    @param user: models.User
+    @return models.Deck
+    """
+    deck = db.query(models.Deck).filter(models.Deck.id == deck_id).first()
+    if deck is None:
+        raise HTTPException(status_code=404, detail="Deck not found")
+    db_deck = models.Deck(
+        name=deck.name,
+        visibility=deck.visibility,
+        color=deck.color,
+        owner_id=user.id
+    )
+    db.add(db_deck)
+    db.commit()
+    db.refresh(db_deck)
+
+    # ajoute le deck à la liste des decks de l'utilisateur
+    user.decks.append(db_deck)
+    db.commit()
+    db.refresh(user)
+
+    # ajoute la progression du deck à la liste des progressions de l'utilisateur 
+    db_progress = models.DeckProgress(
+        user_id=user.id,
+        deck_id=db_deck.id,
+        progress=0
+    )
+    db.add(db_progress)
+    db.commit()
+    db.refresh(db_progress)
+
+    user.deck_progress.append(db_progress)
+    db.commit()
+    db.refresh(user)
+
+    if len(user.decks) == 1:
+        user.active_deck_id = db_deck.id
+        db.commit()
+        db.refresh(user)
+
+    return db_deck
+
 # --- Cards
 async def add_card(db: Session, card: schemas.CardCreate, deck_id : models.Deck) -> models.Card:
     """

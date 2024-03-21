@@ -57,18 +57,46 @@ class DashboardPage(ft.View):
                 padding=ft.padding.symmetric(vertical=50),
             ),
 
-            ft.Column(
-                horizontal_alignment=ft.MainAxisAlignment.CENTER,
-                spacing=30,
+            ft.Row(
+                alignment=ft.MainAxisAlignment.CENTER,
                 controls=[
-                    self.CardHolder,
-                    ft.CupertinoButton(
-                        "Révéler",
-                        bgcolor=ft.colors.GREEN_ACCENT_700,
-                        on_click=self.animate_card,
+                    ft.Column(
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                        spacing=30,
+                        controls=[
+                            self.CardHolder,
+                            ft.CupertinoButton(
+                                "Révéler",
+                                bgcolor=ft.colors.GREEN_ACCENT_700,
+                                on_click=self.animate_card,
+                            ),
+                        ]
                     ),
                 ]
-            ),  
+            ),
+            # ft.Column(
+            #     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            #     spacing=30,
+            #     controls=[
+            #         self.CardHolder,
+            #         ft.CupertinoButton(
+            #             "Révéler",
+            #             bgcolor=ft.colors.GREEN_ACCENT_700,
+            #             on_click=self.animate_card,
+            #         ),
+            #     ]
+            # ),
+            
+            # ft.Row(
+            #     alignment=ft.MainAxisAlignment.CENTER,
+            #     controls=[
+            #         ft.CupertinoButton(
+            #             "Révéler",
+            #             bgcolor=ft.colors.GREEN_ACCENT_700,
+            #             on_click=self.animate_card,
+            #         ),
+            #     ]
+            # ),  
         ]
 
 

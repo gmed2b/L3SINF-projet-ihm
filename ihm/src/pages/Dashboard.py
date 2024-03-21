@@ -29,7 +29,7 @@ class DashboardPage(ft.View):
             content=ft.Container(
                 padding=60,
                 content=ft.Container(
-                    content=ft.Text("defefefef", size=18),
+                    content=ft.Text("Le concept consistant à fournir une interface unique à des entités pouvant avoir différents types morphisme", size=12),
                     margin=10,
                     padding=10,
                     alignment=ft.alignment.center,
@@ -49,6 +49,39 @@ class DashboardPage(ft.View):
             switch_out_curve=ft.AnimationCurve.BOUNCE_IN,
         )
 
+        self.RevealButton = ft.CupertinoButton(
+            "Révéler",
+            bgcolor=ft.colors.GREEN_ACCENT_700,
+            on_click=self.animate_card,
+        )
+
+        self.ThumbsRow = ft.Row(
+            controls=[
+                ft.IconButton(
+                    icon=ft.icons.THUMB_UP,
+                    icon_color="white",
+                    bgcolor=ft.colors.GREEN_ACCENT_700,
+                    on_click=self.animate_card,
+                ),
+                ft.IconButton(
+                    icon=ft.icons.THUMBS_UP_DOWN,
+                    icon_color="white",
+                    bgcolor=ft.colors.ORANGE_ACCENT_700,
+                    on_click=self.animate_card,
+                ),
+                ft.IconButton(
+                    icon=ft.icons.THUMB_DOWN,
+                    icon_color="white",
+                    bgcolor=ft.colors.RED_ACCENT_700,
+                    on_click=self.animate_card,
+                ),
+            ],
+        )
+
+        self.ButtonHolder = ft.Container(
+            content=self.RevealButton,
+        )
+        
         self.controls = [
             ft.Container(
                 alignment=ft.alignment.center,
@@ -64,18 +97,15 @@ class DashboardPage(ft.View):
                         spacing=30,
                         controls=[
                             self.CardHolder,
-                            ft.CupertinoButton(
-                                "Révéler",
-                                bgcolor=ft.colors.GREEN_ACCENT_700,
-                                on_click=self.animate_card,
-                            ),
-                        ]
+                            self.ButtonHolder,
+                        ],
                     ),
-                ]
+                ],
             ),
         ]
 
 
     def animate_card(self, e):
         self.CardHolder.content = self.BackCard if self.CardHolder.content == self.FrontCard else self.FrontCard
+        self.ButtonHolder.content = self.RevealButton if self.CardHolder.content == self.FrontCard else self.ThumbsRow
         self.page.update()

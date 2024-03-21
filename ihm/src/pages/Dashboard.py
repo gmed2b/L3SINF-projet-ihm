@@ -1,4 +1,3 @@
-import time
 import flet as ft
 from src.components.organisms.BottomBar import BottomNavigationBar
 
@@ -74,29 +73,6 @@ class DashboardPage(ft.View):
                     ),
                 ]
             ),
-            # ft.Column(
-            #     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            #     spacing=30,
-            #     controls=[
-            #         self.CardHolder,
-            #         ft.CupertinoButton(
-            #             "Révéler",
-            #             bgcolor=ft.colors.GREEN_ACCENT_700,
-            #             on_click=self.animate_card,
-            #         ),
-            #     ]
-            # ),
-            
-            # ft.Row(
-            #     alignment=ft.MainAxisAlignment.CENTER,
-            #     controls=[
-            #         ft.CupertinoButton(
-            #             "Révéler",
-            #             bgcolor=ft.colors.GREEN_ACCENT_700,
-            #             on_click=self.animate_card,
-            #         ),
-            #     ]
-            # ),  
         ]
 
 

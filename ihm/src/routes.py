@@ -1,4 +1,4 @@
-from src.pages import Landing, Login, Dashboard, Explore, Profile,EditDeck
+from src.pages import Landing, Login, Dashboard, Explore, Profile,EditDeck, Addcard
 
 ROUTES = {
     "/landing": Landing.LandingPage,
@@ -6,5 +6,6 @@ ROUTES = {
     "/": Dashboard.DashboardPage,
     "/explore": Explore.ExplorePage,
     "/profile": Profile.ProfilePage,
-    "/edit": EditDeck.EditDeckPage
+    "/edit": EditDeck.EditDeckPage,
+    "/addcard": Addcard.AddcardPage
 }

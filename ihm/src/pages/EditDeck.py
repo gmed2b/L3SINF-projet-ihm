@@ -14,6 +14,8 @@ class EditDeckPage(ft.View):
         self.editing_deck_id = self.page.client_storage.get('editing_deck_id')
         self.editing_deck = self.fetch_deck(self.editing_deck_id)
 
+        print(f"EditDeckPage {self.editing_deck}")
+
 
         self.DeckNameField = ft.TextField(
             value=self.editing_deck['name'],
@@ -43,7 +45,7 @@ class EditDeckPage(ft.View):
                             icon=ft.icons.ARROW_CIRCLE_LEFT_OUTLINED,
                             icon_color="blue400",
                             icon_size=20,
-                            tooltip="Pause record",
+                            on_click=lambda _: self.page.go("/profile")
                         ),
                         ft.Text(f"{self.editing_deck['name']}", size=30),
                     ]
@@ -58,6 +60,9 @@ class EditDeckPage(ft.View):
                         self.DeckColorField,
                     ]
                 )
+            ),
+            ft.Column(
+                controls=self.fill_cards()
             ),
             ft.Container(
                 padding=ft.padding.only(top=50),
@@ -85,6 +90,18 @@ class EditDeckPage(ft.View):
 
     def handle_save_deck(self):
         pass
+
+
+    def fill_cards(self):
+        return [
+            ft.Card(
+                content=ft.Container(
+                    padding=ft.padding.symmetric(horizontal=20, vertical=15),
+                    content=ft.Text(card['front_content'])
+                )
+            )
+            for card in self.editing_deck['cards']
+        ]
 
 
     def fetch_deck(self, deck_id):

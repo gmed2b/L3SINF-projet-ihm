@@ -1,9 +1,9 @@
 # --- Importation des modules
-# -- Fast API 
+# -- Fast API
 from fastapi import FastAPI, Depends
 # OAuth2PasswordBearer est utilisé pour la gestion de l'authentification, OAuth2PasswordRequestForm est utilisé pour la gestion de la requête d'authentification
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-# CORS est utilisé pour la gestion des requêtes CORS 
+# CORS est utilisé pour la gestion des requêtes CORS
 from fastapi.middleware.cors import CORSMiddleware
 # --- SQLAlchemy
 from sqlalchemy.orm import Session
@@ -30,7 +30,7 @@ tags_metadata = [
     {
         "name": "Card",
         "description": "Operations with cards.",
-    }, 
+    },
     {
         "name": "Train",
         "description": "Operations with training.",
@@ -65,7 +65,7 @@ app.add_middleware(
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # --- Routes
-# --- Server 
+# --- Server
 @app.get("/", tags=["Server"])
 async def root():
     """
@@ -79,9 +79,9 @@ async def read_item():
     Cette route permet de récupérer le temps UNIX
     """
     unix_timestamp = datetime.now().timestamp()
-    return {"unixTime": unix_timestamp} 
+    return {"unixTime": unix_timestamp}
 
-# --- Users 
+# --- Users
 # On ne peut pas changer le nom de la route, c'est une route prédéfinie par FastAPI
 @app.post("/token", response_model=schemas.Token, tags=["Users"])
 async def login_for_access_token(
@@ -261,7 +261,7 @@ async def add_card(
 async def update_card(
     card_id: int,
     current_user: Annotated[schemas.User, Depends(services.get_current_user)],
-    state: str = "not memorized" or "memorized" or "in progress", # créer un enum pour les états + faire un schema + gérer les erreurs 
+    state: str = "not memorized" or "memorized" or "in progress", # créer un enum pour les états + faire un schema + gérer les erreurs
     db: Session = Depends(services.get_db),
 )-> schemas.Card:
     """
@@ -275,17 +275,15 @@ async def update_card(
     return await services.update_card(db, card_id, state, current_user)
 
 # --- Train
-@app.get("/train/radom/{deck_id}", response_model=schemas.Card, tags=["Train"])
+@app.get("/train/random", response_model=schemas.Card, tags=["Train"])
 async def read_random_card(
-    deck_id: int,
     current_user: Annotated[schemas.User, Depends(services.get_current_user)],
     db: Session = Depends(services.get_db),
 )-> schemas.Card:
     """
     Cette route permet de récupérer une carte aléatoire d'un deck
-    @param deck_id: int
     @param current_user: schemas.User
     @param db: Session
     @return schemas.Card
     """
-    return await services.get_random_card(db, deck_id, current_user)
+    return await services.get_random_card(db, current_user)

@@ -160,7 +160,7 @@ async def add_deck(db: Session, deck: schemas.DeckCreate, user: models.User) -> 
     db.commit()
     db.refresh(user)
 
-    # ajoute la progression du deck à la liste des progressions de l'utilisateur 
+    # ajoute la progression du deck à la liste des progressions de l'utilisateur
     db_progress = models.DeckProgress(
         user_id=user.id,
         deck_id=db_deck.id,
@@ -192,7 +192,7 @@ async def get_decks(db: Session, user: models.User) -> list:
 
 async def get_deck(db: Session, deck_id: int, user: models.User) -> models.Deck:
     """
-    Cette fonction permet de récupérer un deck spécifique 
+    Cette fonction permet de récupérer un deck spécifique
     @param db: Session
     @param deck_id: int
     @param user: models.User
@@ -221,7 +221,7 @@ async def update_deck_visibility(db: Session, deck_id: int, visibility: str, use
     deck = db.query(models.Deck).filter(models.Deck.id == deck_id).first()
     if deck is None:
         raise HTTPException(status_code=404, detail="Deck not found")
-    
+
     # Tu dois être le propriétaire du deck pour changer la visibilité
     if deck.owner_id != user.id:
         raise HTTPException(status_code=403, detail="You are not the owner of the deck")
@@ -257,7 +257,7 @@ async def copy_deck(db: Session, deck_id: int, user: models.User) -> models.Deck
     db.commit()
     db.refresh(user)
 
-    # ajoute la progression du deck à la liste des progressions de l'utilisateur 
+    # ajoute la progression du deck à la liste des progressions de l'utilisateur
     db_progress = models.DeckProgress(
         user_id=user.id,
         deck_id=db_deck.id,
@@ -297,7 +297,7 @@ async def add_card(db: Session, card: schemas.CardCreate, deck_id : models.Deck)
     db.refresh(db_card)
 
     deck = db.query(models.Deck).filter(models.Deck.id == deck_id).first()
-    
+
     # ajoute la carte à la liste des cartes du deck
     deck.cards.append(db_card)
     db.commit()
@@ -325,21 +325,22 @@ async def update_card(db: Session, card_id: int, state: str, user_id: str) -> mo
     return card
 
 # --- Train
-async def get_random_card(db: Session, deck_id: int, user: models.User) -> models.Card:
+async def get_random_card(db: Session, user: models.User) -> models.Card:
     """
     Cette fonction permet de récupérer une carte aléatoire d'un deck
     @param db: Session
-    @param deck_id: int
     @param user: models.User
     @return models.Card
     """
-    if deck_id not in [deck.id for deck in user.decks]:
-        raise HTTPException(status_code=404, detail="Deck not found")
+    deck_id = user.active_deck_id
+    if deck_id is None or not deck_id:
+        raise HTTPException(status_code=404, detail="No active deck")
+
     deck = db.query(models.Deck).filter(models.Deck.id == deck_id).first()
     size = len(deck.cards)
     if size == 0:
         raise HTTPException(status_code=404, detail="No card in the deck")
-    
+
     # chiffre aléatoire entre 0 et la taille du deck
     random_index = random.randint(0, size-1)
     cards = deck.cards

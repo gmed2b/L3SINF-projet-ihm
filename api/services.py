@@ -136,6 +136,19 @@ async def set_active_deck(db: Session, deck_id: int, user: models.User) -> model
     db.refresh(user)
     return user
 
+async def get_active_deck(db: Session, user: models.User) -> models.Deck:
+    """
+    Cette fonction permet de récupérer le deck actif d'un utilisateur
+    @param db: Session
+    @param user: models.User
+    @return models.Deck
+    """
+    if user.active_deck_id is None:
+        raise HTTPException(status_code=404, detail="No active deck")
+    
+    active_deck_id = user.active_deck_id
+    deck_actif = db.query(models.Deck).filter(models.Deck.id == active_deck_id).first()
+    return deck_actif
 # --- Decks
 async def add_deck(db: Session, deck: schemas.DeckCreate, user: models.User) -> models.Deck:
     """

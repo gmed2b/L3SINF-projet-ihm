@@ -158,6 +158,20 @@ async def set_active_deck(
     """
     return await services.set_active_deck(db, deck_id, current_user)
 
+# routes qui récupère le deck actif 
+@app.get("/users/active-deck", response_model=schemas.Deck, tags=["Users"])
+async def get_active_deck(
+    current_user: Annotated[schemas.User, Depends(services.get_current_user)],
+    db: Session = Depends(services.get_db)
+)-> schemas.Deck:
+    """
+    Cette route permet de récupérer le deck actif d'un utilisateur
+    @param current_user: schemas.User
+    @param db: Session
+    @return schemas.Deck
+    """
+    return await services.get_active_deck(db, current_user)
+
 # --- Deck
 @app.get("/decks/", response_model=list[schemas.Deck], tags=["Deck"])
 async def read_decks(
@@ -279,7 +293,7 @@ async def update_card(
 async def play_deck(
     current_user: Annotated[schemas.User, Depends(services.get_current_user)],
     db: Session = Depends(services.get_db),
-):
+) -> schemas.Card:
     """
     Cette route permet de jouer avec un deck
     @param current_user: schemas.User

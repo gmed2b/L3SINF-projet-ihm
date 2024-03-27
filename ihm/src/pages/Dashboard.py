@@ -1,5 +1,7 @@
-import flet as ft
+import requests, flet as ft
+from src.auth import API_URL, get_auth_header
 from src.components.organisms.BottomBar import BottomNavigationBar
+from src.types.CardStatus import CardStatus
 
 class DashboardPage(ft.View):
 
@@ -15,12 +17,17 @@ class DashboardPage(ft.View):
             content=ft.Text("La suite en V2"),
         )
 
+        self.random_picked_card = self.fetch_random_card()
+        self.front_content_text = self.random_picked_card["front_content"] if self.random_picked_card else "none"
+        self.back_content_text = self.random_picked_card["back_content"] if self.random_picked_card else "none"
+
+
         # Face recto de la carte
         self.FrontCard = ft.Card(
             content=ft.Container(
                 padding=60,
                 content=ft.Container(
-                    content=ft.Text("Polymorphisme", size=18),
+                    content=ft.Text(self.front_content_text, size=18),
                     margin=10,
                     padding=10,
                     alignment=ft.alignment.center,
@@ -36,7 +43,7 @@ class DashboardPage(ft.View):
             content=ft.Container(
                 padding=60,
                 content=ft.Container(
-                    content=ft.Text("Le concept consistant à fournir une interface unique à des entités pouvant avoir différents types morphisme", size=12),
+                    content=ft.Text(self.back_content_text, size=12),
                     margin=10,
                     padding=10,
                     alignment=ft.alignment.center,
@@ -61,7 +68,7 @@ class DashboardPage(ft.View):
         self.RevealButton = ft.CupertinoButton(
             "Révéler",
             bgcolor=ft.colors.GREEN_ACCENT_700,
-            on_click=self.animate_card,
+            on_click=self.toggle_card_animation,
         )
 
         # Variable contenant les boutons "pouce"
@@ -71,19 +78,19 @@ class DashboardPage(ft.View):
                     icon=ft.icons.THUMB_UP,
                     icon_color="white",
                     bgcolor=ft.colors.GREEN_ACCENT_700,
-                    on_click=self.animate_card,
+                    on_click=lambda e: self.update_card_status(CardStatus.MEMORIZED),
                 ),
                 ft.IconButton(
                     icon=ft.icons.THUMBS_UP_DOWN,
                     icon_color="white",
                     bgcolor=ft.colors.ORANGE_ACCENT_700,
-                    on_click=self.animate_card,
+                    on_click=lambda e: self.update_card_status(CardStatus.IN_PROGRESS),
                 ),
                 ft.IconButton(
                     icon=ft.icons.THUMB_DOWN,
                     icon_color="white",
                     bgcolor=ft.colors.RED_ACCENT_700,
-                    on_click=self.animate_card,
+                    on_click=lambda e: self.update_card_status(CardStatus.NOT_MEMORIZED),
                 ),
             ],
         )
@@ -125,11 +132,72 @@ class DashboardPage(ft.View):
             ),
         ]
 
-    def animate_card(self, e):
+
+    def toggle_card_animation(self, e):
         self.CardHolder.content = self.BackCard if self.CardHolder.content == self.FrontCard else self.FrontCard
         self.ButtonHolder.content = self.RevealButton if self.CardHolder.content == self.FrontCard else self.ThumbsRow
         self.page.update()
 
+
     def open_dlg(self, e):
         self.page.dialog.open = True
         self.page.update()
+
+
+    def card_memorized(self, e):
+        self.page.snack_bar = ft.SnackBar(
+            ft.Text("Carte mémorisée"),
+            behavior=ft.SnackBarBehavior.FLOATING,
+            bgcolor=ft.colors.GREEN_400,
+        )
+        self.page.snack_bar.open = True
+        self.page.update()
+
+
+    def roll_new_card(self, e):
+        self.toggle_card_animation(None)
+
+        self.random_picked_card = self.fetch_random_card()
+        self.FrontCard.content.content = ft.Text(self.random_picked_card["front_content"], size=18)
+        self.BackCard.content.content = ft.Text(self.random_picked_card["back_content"], size=12)
+        self.page.update()
+
+
+    def update_card_status(self, status: CardStatus):
+        response = requests.patch(
+            f"{API_URL}/cards/{self.random_picked_card['id']}",
+            headers=get_auth_header(self.page),
+            params={
+                "state": status
+            }
+        )
+
+        if response.status_code != 200:
+            self.page.snack_bar = ft.SnackBar(
+                ft.Text("Erreur lors de la mise à jour de la carte"),
+                behavior=ft.SnackBarBehavior.FLOATING,
+                bgcolor=ft.colors.RED_400,
+            )
+            self.page.snack_bar.open = True
+            self.page.update()
+            return False
+        else:
+            self.roll_new_card(None)
+
+
+    def fetch_random_card(self):
+        response = requests.get(
+            f"{API_URL}/train/random",
+            headers=get_auth_header(self.page)
+        )
+
+        if response.status_code != 200:
+            self.page.snack_bar = ft.SnackBar(
+                ft.Text("Erreur lors de la récupération du deck"),
+                behavior=ft.SnackBarBehavior.FLOATING,
+                bgcolor=ft.colors.RED_400,
+            )
+            self.page.snack_bar.open = True
+            return False
+        else:
+            return response.json()

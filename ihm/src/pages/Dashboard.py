@@ -140,22 +140,17 @@ class DashboardPage(ft.View):
         self.page.update()
 
 
-    def card_memorized(self, e):
-        self.page.snack_bar = ft.SnackBar(
-            ft.Text("Carte mémorisée"),
-            behavior=ft.SnackBarBehavior.FLOATING,
-            bgcolor=ft.colors.GREEN_400,
-        )
-        self.page.snack_bar.open = True
-        self.page.update()
-
-
     def roll_new_card(self, e):
+        # On remet la carte à l'endroit
         self.toggle_card_animation(None)
 
+        # On récupère une nouvelle carte
         self.random_picked_card = self.fetch_random_card()
+
+        # On met à jour les textes
         self.FrontCardText.value = self.random_picked_card["front_content"]
         self.BackCardText.value = self.random_picked_card["back_content"]
+
         self.page.update()
 
 
@@ -178,6 +173,7 @@ class DashboardPage(ft.View):
             self.page.update()
             return False
         else:
+            self.card_updated_toast()
             self.roll_new_card(None)
 
 
@@ -197,3 +193,13 @@ class DashboardPage(ft.View):
             return False
         else:
             return response.json()
+
+
+    def card_updated_toast(self):
+        self.page.snack_bar = ft.SnackBar(
+            ft.Text("Carte mémorisée"),
+            behavior=ft.SnackBarBehavior.FLOATING,
+            bgcolor=ft.colors.GREEN_400,
+        )
+        self.page.snack_bar.open = True
+        self.page.update()

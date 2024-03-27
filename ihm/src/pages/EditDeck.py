@@ -14,9 +14,6 @@ class EditDeckPage(ft.View):
         self.editing_deck_id = self.page.client_storage.get('editing_deck_id')
         self.editing_deck = self.fetch_deck(self.editing_deck_id)
 
-        print(f"EditDeckPage {self.editing_deck}")
-
-
         self.DeckNameField = ft.TextField(
             value=self.editing_deck['name'],
             hint_text="Nom du deck",
@@ -61,8 +58,27 @@ class EditDeckPage(ft.View):
                     ]
                 )
             ),
-            ft.Column(
-                controls=self.fill_cards()
+            ft.Container(
+                padding=ft.padding.only(top=20),
+                content=ft.Column(
+                    controls=[
+                        ft.Row(
+                            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                            controls=[
+                                ft.Text("Cartes", size=20),
+                                ft.IconButton(
+                                    icon=ft.icons.ADD,
+                                    icon_color="blue400",
+                                    icon_size=20,
+                                    on_click=lambda _: self.goto_add_card()
+                                )
+                            ]
+                        ),
+                        ft.Row(
+                            controls=self.fill_cards()
+                        )
+                    ]
+                )
             ),
             ft.Container(
                 padding=ft.padding.only(top=50),

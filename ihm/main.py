@@ -9,11 +9,12 @@ def main(page: ft.Page):
 
     def route_change(e: ft.RouteChangeEvent):
         page.views.clear()
-        verify_token()
-
         for route in ROUTES:
             if e.route == route:
                 page.views.append(ROUTES[route](page))
+
+        verify_token()
+
         page.update()
 
 

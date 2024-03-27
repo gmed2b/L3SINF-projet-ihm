@@ -275,6 +275,20 @@ async def update_card(
     return await services.update_card(db, card_id, state, current_user)
 
 # --- Train
+@app.get("/train/", tags=["Train"])
+async def play_deck(
+    current_user: Annotated[schemas.User, Depends(services.get_current_user)],
+    db: Session = Depends(services.get_db),
+):
+    """
+    Cette route permet de jouer avec un deck
+    @param current_user: schemas.User
+    @param db: Session
+    @return schemas.Card
+    """
+    return await services.play_deck(db, current_user)
+
+
 @app.get("/train/random", response_model=schemas.Card, tags=["Train"])
 async def read_random_card(
     current_user: Annotated[schemas.User, Depends(services.get_current_user)],

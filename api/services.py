@@ -290,6 +290,7 @@ async def add_card(db: Session, card: schemas.CardCreate, deck_id : models.Deck)
     db_card = models.Card(
         front_content=card.front_content,
         back_content=card.back_content,
+        state=card.state,
         deck_id=deck_id
     )
     db.add(db_card)
@@ -345,3 +346,40 @@ async def get_random_card(db: Session, user: models.User) -> models.Card:
     random_index = random.randint(0, size-1)
     cards = deck.cards
     return cards[random_index]
+
+async def play_deck(db: Session, user: models.User) -> models.Card:
+    """
+    Cette fonction permet de picoher une carte dans un deck (60% de chance d'avoir une carte not memorized, 30% de chance d'avoir une carte in progress, 10% de chance d'avoir une carte memorized)
+    @param db: Session
+    @param user: models.User
+    @return models.Card
+    """
+    deck_id = user.active_deck_id
+    if deck_id is None or not deck_id:
+        raise HTTPException(status_code=404, detail="No active deck")
+
+    deck = db.query(models.Deck).filter(models.Deck.id == deck_id).first()
+    size = len(deck.cards)
+    if size == 0:
+        raise HTTPException(status_code=404, detail="No card in the deck")
+
+    all_cards = deck.cards
+    not_memorized_cards = [card for card in all_cards if card.state == "not memorized"]
+    in_progress_cards = [card for card in all_cards if card.state == "in progress"]
+    memorized_cards = [card for card in all_cards if card.state == "memorized"]
+
+    random_index = random.randint(0, 100)
+
+    if random_index < 60 and not_memorized_cards:
+        print("not memorized")
+        return random.choice(not_memorized_cards)
+    elif random_index < 90 and in_progress_cards:
+        print("in progress")
+        return random.choice(in_progress_cards)
+    elif memorized_cards:
+        print("memorized")
+        return random.choice(memorized_cards)
+    else:
+        # If no cards found in any state, return a random card from the deck
+        print("No cards in the specified states, returning random card")
+        return random.choice(all_cards)

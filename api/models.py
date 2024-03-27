@@ -33,7 +33,6 @@ class User(Base):
 
 
 #--- Deck
-# --- Deck
 class Deck(Base):
     __tablename__ = "Decks"
     id = Column(Integer, primary_key=True, index=True)

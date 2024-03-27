@@ -23,34 +23,30 @@ class DashboardPage(ft.View):
 
 
         # Face recto de la carte
+        self.FrontCardText = ft.Text(self.front_content_text, size=20, text_align=ft.TextAlign.CENTER)
         self.FrontCard = ft.Card(
             content=ft.Container(
-                padding=60,
-                content=ft.Container(
-                    content=ft.Text(self.front_content_text, size=18),
-                    margin=10,
-                    padding=10,
-                    alignment=ft.alignment.center,
-                    width=150,
-                    height=150,
-                    border_radius=10,
-                ),
+                content=self.FrontCardText,
+                margin=10,
+                padding=10,
+                alignment=ft.alignment.center,
+                width=300,
+                height=300,
+                border_radius=10,
             ),
         )
 
         # Face verso de la carte
+        self.BackCardText = ft.Text(self.back_content_text, size=16)
         self.BackCard = ft.Card(
             content=ft.Container(
-                padding=60,
-                content=ft.Container(
-                    content=ft.Text(self.back_content_text, size=12),
-                    margin=10,
-                    padding=10,
-                    alignment=ft.alignment.center,
-                    width=150,
-                    height=150,
-                    border_radius=10,
-                ),
+                content=self.BackCardText,
+                margin=10,
+                padding=10,
+                alignment=ft.alignment.center,
+                width=300,
+                height=300,
+                border_radius=10,
             ),
         )
 
@@ -158,8 +154,8 @@ class DashboardPage(ft.View):
         self.toggle_card_animation(None)
 
         self.random_picked_card = self.fetch_random_card()
-        self.FrontCard.content.content = ft.Text(self.random_picked_card["front_content"], size=18)
-        self.BackCard.content.content = ft.Text(self.random_picked_card["back_content"], size=12)
+        self.FrontCardText.value = self.random_picked_card["front_content"]
+        self.BackCardText.value = self.random_picked_card["back_content"]
         self.page.update()
 
 

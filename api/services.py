@@ -194,6 +194,29 @@ async def add_deck(db: Session, deck: schemas.DeckCreate, user: models.User) -> 
 
     return db_deck
 
+
+async def update_deck(db: Session, deck_id: int, deck: schemas.DeckCreate, user: models.User) -> models.Deck:
+    """
+    Cette fonction permet de mettre à jour un deck
+    @param db: Session
+    @param deck_id: int
+    @param deck: schemas.DeckCreate
+    @param user: models.User
+    @return models.Deck
+    """
+    db_deck = db.query(models.Deck).filter(models.Deck.id == deck_id).first()
+    if db_deck is None:
+        raise HTTPException(status_code=404, detail="Deck not found")
+    if db_deck.owner_id != user.id:
+        raise HTTPException(status_code=403, detail="You are not the owner of the deck")
+    db_deck.name = deck.name
+    db_deck.visibility = deck.visibility
+    db_deck.color = deck.color
+    db.commit()
+    db.refresh(db_deck)
+    return db_deck
+
+
 async def get_decks(db: Session, user: models.User) -> list:
     """
     Cette fonction permet de récupérer tous les decks d'un utilisateur

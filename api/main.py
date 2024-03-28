@@ -186,6 +186,23 @@ async def read_decks(
     """
     return await services.get_decks(db, current_user)
 
+@app.put("/decks/{deck_id}", response_model=schemas.Deck, tags=["Deck"])
+async def update_deck(
+    deck_id: int,
+    deck: schemas.DeckBase,
+    current_user: Annotated[schemas.User, Depends(services.get_current_user)],
+    db: Session = Depends(services.get_db),
+)-> schemas.Deck:
+    """
+    Cette route permet de modifier un deck
+    @param deck_id: int
+    @param deck: schemas.DeckBase
+    @param current_user: schemas.User
+    @param db: Session
+    @return schemas.Deck
+    """
+    return await services.update_deck(db, deck_id, deck, current_user)
+
 @app.get("/decks/{deck_id}", response_model=schemas.Deck, tags=["Deck"])
 async def read_deck(
     deck_id: int,
@@ -275,7 +292,7 @@ async def add_card(
 async def update_card(
     card_id: int,
     current_user: Annotated[schemas.User, Depends(services.get_current_user)],
-    state: str = "not memorized" or "memorized" or "in progress", # créer un enum pour les états + faire un schema + gérer les erreurs
+    state: schemas.State,
     db: Session = Depends(services.get_db),
 )-> schemas.Card:
     """

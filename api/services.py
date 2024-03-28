@@ -194,6 +194,26 @@ async def add_deck(db: Session, deck: schemas.DeckCreate, user: models.User) -> 
 
     return db_deck
 
+async def delete_deck(db: Session, deck_id: int, user: models.User) -> models.Deck:
+    """
+    Cette fonction permet de supprimer un deck
+    @param db: Session
+    @param deck_id: int
+    @param user: models.User
+    @return models.Deck
+    """
+    # if deck actif 
+    if user.active_deck_id == deck_id:
+        return HTTPException(status_code=403, detail="You can't delete your active deck")
+    
+    db_deck = db.query(models.Deck).filter(models.Deck.id == deck_id).first()
+    if db_deck is None:
+        raise HTTPException(status_code=404, detail="Deck not found")
+    if db_deck.owner_id != user.id:
+        raise HTTPException(status_code=403, detail="You are not the owner of the deck")
+    db.delete(db_deck)
+    db.commit()
+    return db_deck
 
 async def update_deck(db: Session, deck_id: int, deck: schemas.DeckCreate, user: models.User) -> models.Deck:
     """

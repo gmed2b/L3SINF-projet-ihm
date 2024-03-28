@@ -233,6 +233,21 @@ async def add_deck(
     """
     return await services.add_deck(db, deck, current_user)
 
+# delete deck 
+@app.delete("/decks/{deck_id}", response_model=schemas.Deck, tags=["Deck"])
+async def delete_deck(
+    deck_id: int,
+    current_user: Annotated[schemas.User, Depends(services.get_current_user)],
+    db: Session = Depends(services.get_db)
+)-> schemas.Deck:
+    """
+    Cette route permet de supprimer un deck
+    @param deck_id: int
+    @param current_user: schemas.User
+    @param db: Session
+    @return schemas.Deck
+    """
+    return await services.delete_deck(db, deck_id, current_user)
 @app.patch("/decks/visibility/{deck_id}", response_model=schemas.Deck, tags=["Deck"])
 async def update_deck(
     deck_id: int,

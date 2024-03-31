@@ -8,7 +8,7 @@ class ProfilePage(ft.View):
     def __init__(self, page: ft.Page):
         super(ProfilePage, self).__init__()
         self.page = page
-        self.page.title = "Profile page"
+        self.page.title = "Profil page"
 
         self.navigation_bar = BottomNavigationBar(self.page, selected_index=2)
 
@@ -80,7 +80,7 @@ class ProfilePage(ft.View):
         self.controls = [
             ft.Container(
                 content=ft.Text(
-                    value="Profile",
+                    value="Votre Profil",
                     size=30,
                     weight=ft.FontWeight.BOLD,
                 ),
@@ -89,7 +89,7 @@ class ProfilePage(ft.View):
             ft.Column(
                 spacing=20,
                 controls=[
-                    ProfileInformations(),
+                    ProfileInformations(self.page),
                     self.SearchField,
                     ft.Container(
                         content=self.DecksView,

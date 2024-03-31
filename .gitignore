@@ -1,11 +1,10 @@
 .DS_Store
 **/__pychache__
 .env
+**/venv
 
 # API
-api/venv
 api/.DS_Store
-api/venv/*
 
 # CLI
 cli/token.txt

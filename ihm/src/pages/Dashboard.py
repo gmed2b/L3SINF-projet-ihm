@@ -1,9 +1,33 @@
 import requests, flet as ft
+import src.services.user_service as us
+import src.services.decks_service as ds
 from src.auth import API_URL, get_auth_header
-from src.components.organisms.BottomBar import BottomNavigationBar
 from src.types.CardStatus import CardStatus
+from src.components.organisms.BottomBar import BottomNavigationBar
+from src.components.molecules.ChangeDeckDialog import ChangeDeckDialog
+from src.components.atoms.Snack import Snack
 
 class DashboardPage(ft.View):
+
+    def on_mount(self):
+        self.random_picked_card = None
+        self.active_deck_name = None
+
+        try:
+            self.active_deck_name = ds.fetch_active_deck(self.page)["name"]
+        except Exception as e:
+            Snack(self.page, str(e))
+
+        try:
+            self.random_picked_card = us.fetch_random_card(self.page)
+        except Exception as e:
+            Snack(self.page, str(e))
+
+        self.front_content_text = self.random_picked_card["front_content"] if self.random_picked_card else "none"
+        self.back_content_text = self.random_picked_card["back_content"] if self.random_picked_card else "none"
+
+        self.page.update()
+
 
     def __init__(self, page: ft.Page):
         super(DashboardPage, self).__init__()
@@ -11,19 +35,21 @@ class DashboardPage(ft.View):
         self.page.title = "Dashboard page"
 
         self.navigation_bar = BottomNavigationBar(self.page, selected_index=1)
-
         self.page.dialog = ft.AlertDialog(
-            title=ft.Text("Choisissez un deck"),
-            content=ft.Text("La suite en V2"),
+            title=ft.Text("Choisir un deck"),
+            content=ChangeDeckDialog(self.page, self.on_mount),
         )
 
-        self.random_picked_card = self.fetch_random_card()
-        self.front_content_text = self.random_picked_card["front_content"] if self.random_picked_card else "none"
-        self.back_content_text = self.random_picked_card["back_content"] if self.random_picked_card else "none"
+        self.on_mount()
 
+        print(self.front_content_text, self.back_content_text)
 
         # Face recto de la carte
-        self.FrontCardText = ft.Text(self.front_content_text, size=20, text_align=ft.TextAlign.CENTER)
+        self.FrontCardText = ft.Text(
+            self.front_content_text,
+            size=22, text_align=ft.TextAlign.CENTER,
+            weight=ft.FontWeight.BOLD
+        )
         self.FrontCard = ft.Card(
             content=ft.Container(
                 content=self.FrontCardText,
@@ -109,10 +135,14 @@ class DashboardPage(ft.View):
             ),
             ft.Container(
                 alignment=ft.alignment.center,
-                content=ft.Text("P.O.O", size=60),
-                padding=ft.padding.symmetric(vertical=50),
+                content=ft.Text(self.active_deck_name, size=48),
+                padding=ft.padding.only(top=20, bottom=10),
+                margin=ft.margin.symmetric(horizontal=50, vertical=10),
+                border=ft.Border(bottom=ft.BorderSide(
+                    width=3,
+                    color=ft.colors.GREEN_ACCENT_200,
+                )),
             ),
-
             ft.Row(
                 alignment=ft.MainAxisAlignment.CENTER,
                 controls=[
@@ -136,8 +166,9 @@ class DashboardPage(ft.View):
 
 
     def open_dlg(self, e):
-        self.page.dialog.open = True
-        self.page.update()
+        # self.page.dialog.open = True
+        # self.page.update()
+        self.page.go("/changedeck")
 
 
     def roll_new_card(self, e):
@@ -145,7 +176,7 @@ class DashboardPage(ft.View):
         self.toggle_card_animation(None)
 
         # On récupère une nouvelle carte
-        self.random_picked_card = self.fetch_random_card()
+        self.random_picked_card = us.fetch_random_card(self.page)
 
         # On met à jour les textes
         self.FrontCardText.value = self.random_picked_card["front_content"]
@@ -164,42 +195,9 @@ class DashboardPage(ft.View):
         )
 
         if response.status_code != 200:
-            self.page.snack_bar = ft.SnackBar(
-                ft.Text("Erreur lors de la mise à jour de la carte"),
-                behavior=ft.SnackBarBehavior.FLOATING,
-                bgcolor=ft.colors.RED_400,
-            )
+            self.page.snack_bar = Snack(self.page, "Erreur lors de la mise à jour de la carte")
             self.page.snack_bar.open = True
             self.page.update()
             return False
         else:
-            self.card_updated_toast()
             self.roll_new_card(None)
-
-
-    def fetch_random_card(self):
-        response = requests.get(
-            f"{API_URL}/train/random",
-            headers=get_auth_header(self.page)
-        )
-
-        if response.status_code != 200:
-            self.page.snack_bar = ft.SnackBar(
-                ft.Text("Erreur lors de la récupération du deck"),
-                behavior=ft.SnackBarBehavior.FLOATING,
-                bgcolor=ft.colors.RED_400,
-            )
-            self.page.snack_bar.open = True
-            return False
-        else:
-            return response.json()
-
-
-    def card_updated_toast(self):
-        self.page.snack_bar = ft.SnackBar(
-            ft.Text("Carte mémorisée"),
-            behavior=ft.SnackBarBehavior.FLOATING,
-            bgcolor=ft.colors.GREEN_400,
-        )
-        self.page.snack_bar.open = True
-        self.page.update()

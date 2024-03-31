@@ -1,5 +1,6 @@
 import requests,json, flet as ft
 from src.auth import API_URL
+from src.components.atoms.Snack import Snack
 
 class LoginPage(ft.View):
 
@@ -66,19 +67,9 @@ class LoginPage(ft.View):
             # TODO: encrypt the token
             self.page.client_storage.set("token", token)
 
-            self.page.snack_bar = ft.SnackBar(
-                ft.Text("Authentification réussie"),
-                behavior=ft.SnackBarBehavior.FLOATING
-            )
-            self.page.snack_bar.open = True
-            self.page.update()
+            Snack(self.page, "Authentification réussie", bgcolor=ft.colors.GREEN_ACCENT_200)
 
             self.page.go("/")
         else:
-            self.page.snack_bar = ft.SnackBar(
-                ft.Text("Email ou mot de passe incorrecte"),
-                behavior=ft.SnackBarBehavior.FLOATING
-            )
-            self.page.snack_bar.open = True
-            self.page.update()
+            Snack(self.page, "Erreur lors de l'authentification")
 

@@ -1,12 +1,21 @@
 import flet as ft
+import src.services.user_service as us
+from src.components.atoms.Snack import Snack
 from src.components.atoms.CountDisplay import CountDisplay
 
 TEST_PROFILE_TEXT = 'My teaching activities are taught in the DUT "Multimedia and Internet Professions" (MMI ex-SRC) of the IUT and the Master "Information Systems and Internet" (S2I) of the Faculty of Sciences and Techniques (FST) of the University of Corsica'
 
 class ProfileInformations(ft.UserControl):
 
-    def __init__(self):
+    def __init__(self, page: ft.Page):
         super().__init__()
+        self.page = page
+
+        self.user_informations = None
+        try:
+            self.user_informations = us.fetch_user_info(self.page)
+        except Exception as e:
+            Snack(self.page, str(e))
 
 
     def build(self):
@@ -30,12 +39,12 @@ class ProfileInformations(ft.UserControl):
                                     ft.Column(
                                         controls=[
                                             ft.Text(
-                                                value="Capo",
+                                                value=f"{self.user_informations['firstname']} {self.user_informations['lastname']}",
                                                 size=18,
                                                 weight=ft.FontWeight.BOLD,
                                             ),
                                             ft.Text(
-                                                value="@capo",
+                                                value=self.user_informations['email'],
                                                 size=12,
                                             ),
                                         ],
@@ -45,7 +54,7 @@ class ProfileInformations(ft.UserControl):
                             ),
                             ft.Row(
                                 controls=[
-                                    CountDisplay(value="12", label="Decks"),
+                                    CountDisplay(value=len(self.user_informations["decks"]), label="Decks"),
                                     CountDisplay(value="8", label="J'aime"),
                                     CountDisplay(value="4", label="Abonnés"),
                                 ],

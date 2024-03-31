@@ -1,5 +1,5 @@
 import requests, flet as ft
-from src.auth import API_URL, get_auth_header
+import src.services.decks_service as ds
 from src.components.organisms.BottomBar import BottomNavigationBar
 
 class EditDeckPage(ft.View):
@@ -7,12 +7,16 @@ class EditDeckPage(ft.View):
     def __init__(self, page: ft.Page):
         super(EditDeckPage, self).__init__()
         self.page = page
-        self.page.title = "Edit page"
+        self.page.title = "Edition deck"
 
         self.navigation_bar = BottomNavigationBar(self.page, selected_index=2)
 
         self.editing_deck_id = self.page.client_storage.get('editing_deck_id')
-        self.editing_deck = self.fetch_deck(self.editing_deck_id)
+        try:
+            self.editing_deck = ds.fetch_deck(self.page, self.editing_deck_id)
+        except Exception as e:
+            self.page.go("/profile")
+
 
         self.DeckNameField = ft.TextField(
             value=self.editing_deck['name'],
@@ -74,7 +78,9 @@ class EditDeckPage(ft.View):
                                 )
                             ]
                         ),
-                        ft.Row(
+                        ft.GridView(
+                            max_extent=200,
+                            height=550,
                             controls=self.fill_cards()
                         )
                     ]
@@ -86,10 +92,6 @@ class EditDeckPage(ft.View):
                     alignment=ft.MainAxisAlignment.CENTER,
                     spacing=30,
                     controls=[
-                        ft.ElevatedButton(
-                            text="Ajouter une carte",
-                            on_click=lambda e: self.goto_add_card()
-                        ),
                         ft.ElevatedButton(
                             text="Enregistrer",
                             on_click=lambda e: self.handle_save_deck()
@@ -105,7 +107,16 @@ class EditDeckPage(ft.View):
 
 
     def handle_save_deck(self):
-        pass
+        deck = {
+            'name': self.DeckNameField.value,
+            'color': self.DeckColorField.value,
+        }
+
+        try:
+            ds.update_deck(self.page, self.editing_deck_id, deck)
+            self.page.go("/profile")
+        except Exception as e:
+            print(e)
 
 
     def fill_cards(self):
@@ -113,26 +124,14 @@ class EditDeckPage(ft.View):
             ft.Card(
                 content=ft.Container(
                     padding=ft.padding.symmetric(horizontal=20, vertical=15),
-                    content=ft.Text(card['front_content'])
+                    content=ft.Column(
+                        spacing=20,
+                        controls=[
+                            ft.Text(card['front_content'], text_align=ft.TextAlign.CENTER),
+                            ft.Text(card['state'], text_align=ft.TextAlign.CENTER, size=12, color="blue400"),
+                        ]
+                    )
                 )
             )
             for card in self.editing_deck['cards']
         ]
-
-
-    def fetch_deck(self, deck_id):
-        response = requests.get(
-            f"{API_URL}/decks/{deck_id}",
-            headers=get_auth_header(self.page)
-        )
-
-        if response.status_code != 200:
-            self.page.snack_bar = ft.SnackBar(
-                ft.Text("Erreur lors de la récupération du deck"),
-                behavior=ft.SnackBarBehavior.FLOATING,
-                bgcolor=ft.colors.RED_400,
-            )
-            self.page.snack_bar.open = True
-            return False
-        else:
-            return response.json()

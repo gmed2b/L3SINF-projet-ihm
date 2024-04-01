@@ -8,10 +8,22 @@ def main(page: ft.Page):
     page.theme = ft.Theme(color_scheme_seed="green")
 
     page.window_resizable = True
-    page.window_width = 650
-    page.window_min_width = 650
+    page.window_width = 500
+    page.window_min_width = 500
     page.window_height = 1000
     page.window_min_height = 1000
+
+    def get_selected_tab(page: ft.Page):
+        match page.route:
+            case "/explore":
+                return 0
+            case "/":
+                return 1
+            case "/profile":
+                return 2
+            case _:
+                return 1
+
 
     Routing(
         page = page,
@@ -20,7 +32,7 @@ def main(page: ft.Page):
         navigation_bar = ft.NavigationBar(
             bgcolor= ft.colors.TRANSPARENT,
             on_change=lambda e: on_tab_change(e, page),
-            selected_index=page.client_storage.get("selected_tab") or 1,
+            selected_index=get_selected_tab(page),
             destinations=[
                 ft.NavigationDestination(
                     icon=ft.icons.EXPLORE,
@@ -41,7 +53,6 @@ def main(page: ft.Page):
 
 
     def on_tab_change(e, page: ft.Page):
-        page.client_storage.set("selected_tab", e.control.selected_index)
         match e.control.selected_index:
             case 0:
                 page.go("/explore")

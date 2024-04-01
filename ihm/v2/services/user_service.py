@@ -25,18 +25,6 @@ def fetch_random_card(page: ft.Page):
         return response.json()
 
 
-def fetch_decks(page: ft.Page):
-    response = requests.get(
-        f"{API_URL}/decks",
-        headers=get_auth_header(page)
-    )
-
-    if response.status_code != 200:
-        raise Exception("Erreur lors de la récupération des decks")
-    else:
-        return response.json()
-
-
 def update_active_deck(page: ft.Page, deck_id: int):
     response = requests.patch(
         f"{API_URL}/users/active-deck",

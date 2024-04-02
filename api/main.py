@@ -158,6 +158,20 @@ async def set_active_deck(
     """
     return await services.set_active_deck(db, deck_id, current_user)
 
+# routes qui récupère le deck actif 
+@app.get("/users/active-deck", response_model=schemas.Deck, tags=["Users"])
+async def get_active_deck(
+    current_user: Annotated[schemas.User, Depends(services.get_current_user)],
+    db: Session = Depends(services.get_db)
+)-> schemas.Deck:
+    """
+    Cette route permet de récupérer le deck actif d'un utilisateur
+    @param current_user: schemas.User
+    @param db: Session
+    @return schemas.Deck
+    """
+    return await services.get_active_deck(db, current_user)
+
 # --- Deck
 @app.get("/decks/", response_model=list[schemas.Deck], tags=["Deck"])
 async def read_decks(
@@ -171,6 +185,23 @@ async def read_decks(
     @return list[schemas.Deck]
     """
     return await services.get_decks(db, current_user)
+
+@app.put("/decks/{deck_id}", response_model=schemas.Deck, tags=["Deck"])
+async def update_deck(
+    deck_id: int,
+    deck: schemas.DeckBase,
+    current_user: Annotated[schemas.User, Depends(services.get_current_user)],
+    db: Session = Depends(services.get_db),
+)-> schemas.Deck:
+    """
+    Cette route permet de modifier un deck
+    @param deck_id: int
+    @param deck: schemas.DeckBase
+    @param current_user: schemas.User
+    @param db: Session
+    @return schemas.Deck
+    """
+    return await services.update_deck(db, deck_id, deck, current_user)
 
 @app.get("/decks/{deck_id}", response_model=schemas.Deck, tags=["Deck"])
 async def read_deck(
@@ -202,6 +233,21 @@ async def add_deck(
     """
     return await services.add_deck(db, deck, current_user)
 
+# delete deck 
+@app.delete("/decks/{deck_id}", response_model=schemas.Deck, tags=["Deck"])
+async def delete_deck(
+    deck_id: int,
+    current_user: Annotated[schemas.User, Depends(services.get_current_user)],
+    db: Session = Depends(services.get_db)
+)-> schemas.Deck:
+    """
+    Cette route permet de supprimer un deck
+    @param deck_id: int
+    @param current_user: schemas.User
+    @param db: Session
+    @return schemas.Deck
+    """
+    return await services.delete_deck(db, deck_id, current_user)
 @app.patch("/decks/visibility/{deck_id}", response_model=schemas.Deck, tags=["Deck"])
 async def update_deck(
     deck_id: int,
@@ -261,7 +307,7 @@ async def add_card(
 async def update_card(
     card_id: int,
     current_user: Annotated[schemas.User, Depends(services.get_current_user)],
-    state: str = "not memorized" or "memorized" or "in progress", # créer un enum pour les états + faire un schema + gérer les erreurs
+    state: schemas.State,
     db: Session = Depends(services.get_db),
 )-> schemas.Card:
     """
@@ -275,6 +321,20 @@ async def update_card(
     return await services.update_card(db, card_id, state, current_user)
 
 # --- Train
+@app.get("/train/", tags=["Train"])
+async def play_deck(
+    current_user: Annotated[schemas.User, Depends(services.get_current_user)],
+    db: Session = Depends(services.get_db),
+) -> schemas.Card:
+    """
+    Cette route permet de jouer avec un deck
+    @param current_user: schemas.User
+    @param db: Session
+    @return schemas.Card
+    """
+    return await services.play_deck(db, current_user)
+
+
 @app.get("/train/random", response_model=schemas.Card, tags=["Train"])
 async def read_random_card(
     current_user: Annotated[schemas.User, Depends(services.get_current_user)],

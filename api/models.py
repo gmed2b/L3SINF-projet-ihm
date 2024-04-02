@@ -28,7 +28,8 @@ class User(Base):
                          primaryjoin="User.id==Deck.owner_id") 
 
     # Relation: La progression du deck spécifique à chaque utilisateur
-    deck_progress = relationship("DeckProgress", back_populates="user")
+    deck_progress = relationship("DeckProgress", back_populates="user" , cascade="all, delete",
+        passive_deletes=True)
 
 
 
@@ -51,7 +52,8 @@ class Deck(Base):
     tag = relationship("Tag", back_populates="decks")
 
     # Relation: La progression du deck spécifique à chaque utilisateur
-    user_progress = relationship("DeckProgress", back_populates="deck")
+    user_progress = relationship("DeckProgress", back_populates="deck", cascade="all, delete",
+        passive_deletes=True)
 
 
 
@@ -80,12 +82,13 @@ class Tag(Base):
 # Table de liaison pour la relation entre decks et utilisateurs avec la progression spécifique de chaque utilisateur
 class DeckProgress(Base):
     __tablename__ = "deck_progress"
-    user_id = Column(Integer, ForeignKey("Users.id"), primary_key=True)
-    deck_id = Column(Integer, ForeignKey("Decks.id"), primary_key=True)
+    user_id = Column(Integer, ForeignKey("Users.id", ondelete="CASCADE"), primary_key=True)
+    deck_id = Column(Integer, ForeignKey("Decks.id", ondelete="CASCADE"), primary_key=True)
     progress = Column(Integer)  # La progression du deck pour cet utilisateur
 
     # Relation: Un enregistrement de progression appartient à un utilisateur
     user = relationship("User", back_populates="deck_progress")
+
     # Relation: Un enregistrement de progression appartient à un deck
     deck = relationship("Deck", back_populates="user_progress")
 

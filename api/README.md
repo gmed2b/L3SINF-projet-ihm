@@ -21,8 +21,9 @@ make run
 
 
 ## Architecture
-1. `main.py` - FastAPI application with all the routes
-2. `database.py` - Database connection and models
-3. `schemas.py` - Pydantic models for request and response
-4. `services.py` - Functions to interact with the database
-5. `tasks.py` - Logical functions for the application 
+1. `main.py` - L'application FastAPI avec toutes les routes
+2. `database.py` - Pour la connexion à la base de données, la création des tables et des sessions de base de données 
+3. `schemas.py` - Pour les schémas Pydantic qui sont utilisés pour la validation des données entrantes et sortantes et pour la documentation automatique de l'API avec Swagger et ReDoc 
+4. `services.py` - Pour les fonctions qui utilisent les sessions de base de données pour effectuer des opérations sur la base de données
+5. `tasks.py` - Fonctions utilitaires
+6. `models.py` - Pour les modèles SQLAlchemy qui sont utilisés pour la création des tables de base de données

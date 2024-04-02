@@ -1,5 +1,4 @@
 from flet_route import path
-from middlewares.url_middleware import UrlBasedMiddleware
 from views.index_view import IndexView
 from views.login_view import LoginView
 from views.profile_view import ProfileView

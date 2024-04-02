@@ -25,6 +25,18 @@ def main(page: ft.Page):
                 return 1
 
 
+    def on_tab_change(e, page: ft.Page):
+        match e.control.selected_index:
+            case 0:
+                page.go("/explore")
+            case 1:
+                page.go("/")
+            case 2:
+                page.go("/profile")
+            case _:
+                page.go("/")
+
+
     Routing(
         page = page,
         app_routes = app_routes,
@@ -50,18 +62,6 @@ def main(page: ft.Page):
     )
 
     page.go(page.route)
-
-
-    def on_tab_change(e, page: ft.Page):
-        match e.control.selected_index:
-            case 0:
-                page.go("/explore")
-            case 1:
-                page.go("/")
-            case 2:
-                page.go("/profile")
-            case _:
-                page.go("/")
 
 
 ft.app(

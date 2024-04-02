@@ -15,8 +15,7 @@ class LoginView:
         password = self.PasswordField.value
 
         try:
-            us.login(email, password)
-            token = response.json()["access_token"]
+            token = us.login(email, password)
             self.page.client_storage.set("access_token", token)
             Snack(self.page, "Connexion réussie", bgcolor=ft.colors.GREEN_400)
             self.page.go("/")

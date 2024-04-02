@@ -1,7 +1,7 @@
 import requests, flet as ft
 from services.cards_service import update_card_status
 import services.user_service as us
-from interfaces.CardStatus import CardStatus
+from enums.CardStatus import CardStatus
 from components.Snack import Snack
 
 def FlashCard(page: ft.Page) -> ft.Container:

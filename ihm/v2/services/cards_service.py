@@ -1,6 +1,6 @@
 import requests, flet as ft
 from auth import API_URL, get_auth_header
-from interfaces.CardStatus import CardStatus
+from enums.CardStatus import CardStatus
 
 
 def create_card(page: ft.Page, deck_id: int, card_name: str, card_content: str):

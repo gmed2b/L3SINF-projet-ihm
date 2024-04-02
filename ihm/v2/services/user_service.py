@@ -1,6 +1,22 @@
 import requests, flet as ft
 from auth import API_URL, get_auth_header
 
+def login(email: str, password: str):
+    response = requests.post(
+        url=f"{API_URL}/token",
+        data={
+            "username": email,
+            "password": password
+        }
+    )
+
+    if response.status_code != 200:
+        raise Exception("Erreur lors de la connexion")
+    else:
+        token = response.json()["access_token"]
+        return token
+
+
 def fetch_user_info(page: ft.Page):
     response = requests.get(
         f"{API_URL}/users/me",

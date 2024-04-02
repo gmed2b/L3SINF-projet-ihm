@@ -1,5 +1,6 @@
 import requests, flet as ft
 from auth import API_URL
+import services.user_service as us
 from flet_route import Params,Basket
 from components.PrimaryButton import PrimaryButton
 from components.Snack import Snack
@@ -13,22 +14,14 @@ class LoginView:
         email = self.EmailField.value
         password = self.PasswordField.value
 
-        response = requests.post(
-            url=f"{API_URL}/token",
-            data={
-                "username": email,
-                "password": password
-            }
-        )
-
-        if response.status_code != 200:
-            Snack(self.page, "Erreur lors de la connexion")
-        else:
+        try:
+            us.login(email, password)
             token = response.json()["access_token"]
             self.page.client_storage.set("access_token", token)
-
             Snack(self.page, "Connexion réussie", bgcolor=ft.colors.GREEN_400)
             self.page.go("/")
+        except Exception as e:
+            Snack(self.page, str(e))
 
 
     def view(self, page:ft.page, params:Params, basket:Basket):
